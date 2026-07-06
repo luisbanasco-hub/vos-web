@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>vos · Muy pronto</title>
+<meta name="description" content="Un asistente que atiende tu WhatsApp — y suena como vos. Para negocios argentinos, a cualquier hora.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%2326201c'/%3E%3Cpath d='M20 8c7.2 0 13 4.5 13 10.1 0 5.6-5.8 10-13 10-1.6 0-3.2-.2-4.6-.6L8 31l1.7-5.2C7.7 24.1 6 21.4 6 18.1 6 12.5 12.8 8 20 8Z' fill='%23c8993c'/%3E%3Ccircle cx='14.4' cy='18.3' r='2.1' fill='%2326201c'/%3E%3Ccircle cx='20' cy='18.3' r='2.1' fill='%2326201c'/%3E%3Ccircle cx='25.6' cy='18.3' r='2.1' fill='%2326201c'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#26201c;--gold:#c8993c;--bone:#f6f0e6;--camel:#d8b98a;--clay:#b6764a}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:radial-gradient(120% 90% at 50% 34%,#332a22 0%,#251f1a 52%,#1b1611 100%);font-family:'Hanken Grotesk',system-ui,sans-serif;color:var(--bone);-webkit-font-smoothing:antialiased}
+  .wrap{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:64px 26px 96px;position:relative;overflow:hidden}
+  .glow{position:absolute;top:20%;left:50%;transform:translate(-50%,-50%);width:min(560px,120vw);height:min(560px,120vw);background:radial-gradient(circle,rgba(200,153,60,.42) 0%,rgba(200,153,60,.12) 38%,transparent 68%);filter:blur(6px);pointer-events:none;animation:glow 6s ease-in-out infinite}
+  @keyframes glow{0%,100%{opacity:.6;transform:translate(-50%,-50%) scale(1)}50%{opacity:.9;transform:translate(-50%,-50%) scale(1.09)}}
+  .icon{position:relative;z-index:1;filter:drop-shadow(0 14px 40px rgba(200,153,60,.34))}
+  .icon svg{display:block;width:clamp(94px,26vw,124px);height:auto}
+  .pdot{transform-box:fill-box;transform-origin:center;animation:vosdot 1.5s ease-in-out infinite}
+  .pdot.d2{animation-delay:.22s}.pdot.d3{animation-delay:.44s}
+  @keyframes vosdot{0%,58%,100%{opacity:.26;transform:scale(.7)}28%{opacity:1;transform:scale(1)}}
+  .wm{position:relative;z-index:1;font-weight:700;font-size:clamp(72px,20vw,108px);line-height:.82;letter-spacing:-.05em;color:var(--bone);margin:26px 0 0}
+  .h1{position:relative;z-index:1;font-weight:600;font-size:clamp(26px,7vw,38px);line-height:1.05;letter-spacing:-.02em;color:var(--gold);margin:30px 0 0}
+  .sub{position:relative;z-index:1;font-weight:400;font-size:clamp(16px,4.6vw,20px);line-height:1.5;color:var(--bone);max-width:26ch;margin:14px 0 0}
+  .fine{position:relative;z-index:1;font-weight:500;font-size:clamp(12px,3.4vw,13.5px);line-height:1.5;letter-spacing:.08em;text-transform:uppercase;color:var(--camel);margin:20px 0 0}
+  .formzone{position:relative;z-index:1;width:100%;max-width:400px;margin:38px 0 0}
+  .form{display:flex;flex-direction:column;gap:11px}
+  .field{width:100%;height:54px;border-radius:14px;border:1.5px solid rgba(216,185,138,.35);background:rgba(246,240,230,.05);color:var(--bone);font-weight:500;font-size:16px;font-family:inherit;padding:0 18px;outline:none;transition:border-color .2s,background .2s}
+  .field::placeholder{color:rgba(216,185,138,.6)}
+  .field:focus{border-color:var(--gold);background:rgba(246,240,230,.08)}
+  .btn{height:54px;border-radius:14px;border:none;background:var(--gold);color:var(--ink);font-weight:700;font-size:16px;font-family:inherit;letter-spacing:.01em;cursor:pointer;transition:transform .15s,box-shadow .2s,background .2s;box-shadow:0 10px 30px -10px rgba(200,153,60,.6)}
+  .btn:hover{background:#d6a648;transform:translateY(-1px);box-shadow:0 14px 36px -10px rgba(200,153,60,.7)}
+  .btn:active{transform:translateY(0)}
+  .btn:disabled{opacity:.6;cursor:default;transform:none}
+  @media(min-width:520px){.form{flex-direction:row}.field{flex:1}.btn{padding:0 26px;flex:none}}
+  .done{display:flex;flex-direction:column;align-items:center;gap:8px;padding:22px 20px;border-radius:16px;background:rgba(200,153,60,.1);border:1px solid rgba(200,153,60,.28);animation:rise .5s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .donetitle{font-weight:700;font-size:20px;line-height:1.2;color:var(--gold)}
+  .donesub{font-weight:400;font-size:14.5px;line-height:1.5;color:var(--bone);opacity:.85}
+  .err{margin-top:11px;font-weight:500;font-size:13.5px;line-height:1.4;color:#e0a86a;animation:rise .4s ease both}
+  .foot{position:absolute;bottom:26px;left:0;right:0;text-align:center;font-weight:600;font-size:10px;line-height:1;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);opacity:.75;z-index:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="glow"></div>
+  <div class="icon">
+    <svg viewBox="0 0 40 40" role="img" aria-label="vos">
+      <path d="M20 6.5c8.4 0 15.2 5.3 15.2 11.9 0 6.5-6.8 11.8-15.2 11.8-1.9 0-3.7-.27-5.4-.75L7 34l2-6.1C6.7 25.6 4.8 22.3 4.8 18.4 4.8 11.8 11.6 6.5 20 6.5Z" fill="#c8993c"/>
+      <circle class="pdot" cx="13.6" cy="18.6" r="2.5" fill="#26201c"/>
+      <circle class="pdot d2" cx="20" cy="18.6" r="2.5" fill="#26201c"/>
+      <circle class="pdot d3" cx="26.4" cy="18.6" r="2.5" fill="#26201c"/>
+    </svg>
+  </div>
+  <div class="wm">vos</div>
+  <h1 class="h1">Muy pronto.</h1>
+  <p class="sub">Un asistente que atiende tu WhatsApp — y suena como vos.</p>
+  <div class="fine">Para negocios argentinos · A cualquier hora</div>
+  <div class="formzone">
+    <form class="form" id="waitlist" novalidate>
+      <input class="field" id="email" type="email" placeholder="Tu email" autocomplete="email" required>
+      <button class="btn" id="submit" type="submit">Avisame</button>
+    </form>
+    <div class="err" id="err" hidden>Uy, algo falló. Probá de nuevo.</div>
+    <div class="done" id="done" hidden>
+      <div class="donetitle">Listo. Te avisamos primero.</div>
+      <div class="donesub">Gracias por sumarte. Nos vemos muy pronto.</div>
+    </div>
+  </div>
+</div>
+<div class="foot">vos.chat · Virtual Operation System</div>
+
+<script>
+  // ── vos-multitenant Supabase waitlist ──────────────────────────────
+  // The anon key is public by design; it is used ONLY for the single
+  // vos_join_waitlist RPC call below.
+  var SUPABASE_URL = 'https://nqjtrwijfoyuqrkeelve.supabase.co'; // ← PROJECT_URL
+  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5xanRyd2lqZm95dXFya2VlbHZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzNTQ5NjYsImV4cCI6MjA5ODkzMDk2Nn0.Rx7JOibEeQnao0xV5jeLJFATid18dVam-3guqvH8Og8';               // ← ANON_KEY
+  // ────────────────────────────────────────────────────────────────────
+
+  (function () {
+    var form = document.getElementById('waitlist');
+    var input = document.getElementById('email');
+    var btn = document.getElementById('submit');
+    var errEl = document.getElementById('err');
+    var doneEl = document.getElementById('done');
+    var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    var busy = false;
+
+    input.addEventListener('input', function () { errEl.hidden = true; });
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (busy) return;
+      var email = (input.value || '').trim();
+      if (!EMAIL_RE.test(email)) { errEl.hidden = false; return; }
+
+      busy = true;
+      errEl.hidden = true;
+      btn.disabled = true;
+      input.disabled = true;
+      btn.textContent = 'Enviando…';
+
+      fetch(SUPABASE_URL + '/rest/v1/rpc/vos_join_waitlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+        },
+        body: JSON.stringify({ p_email: email, p_source: 'coming-soon' })
+      }).then(function (res) {
+        if (!res.ok) throw new Error('rpc ' + res.status);
+        form.hidden = true;
+        errEl.hidden = true;
+        doneEl.hidden = false;
+      }).catch(function () {
+        errEl.hidden = false;
+        busy = false;
+        btn.disabled = false;
+        input.disabled = false;
+        btn.textContent = 'Avisame';
+      });
+    });
+  })();
+</script>
+</body>
+</html>
