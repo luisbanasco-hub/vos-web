@@ -133,6 +133,38 @@
   .donesub{font-weight:400;font-size:14.5px;line-height:1.5;color:var(--bone);opacity:.85;max-width:32ch}
   .err{margin-top:11px;font-weight:500;font-size:13.5px;line-height:1.4;color:#e0a86a;animation:rise .4s ease both}
 
+  /* ============ TU NÚMERO — nota + botón info ============ */
+  .coex-note{font-size:15px;line-height:1.55;color:var(--bone);opacity:.82;margin:44px 0 0;display:flex;gap:9px;align-items:center;justify-content:center;flex-wrap:wrap}
+  .infobtn{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--gold);background:transparent;color:var(--gold);font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:13px;line-height:1;cursor:pointer;transition:background .2s,color .2s;flex-shrink:0}
+  .infobtn:hover{background:var(--gold);color:var(--ink)}
+  .infobtn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .coex-fine{font-size:13px;line-height:1.5;color:var(--camel);opacity:.8;margin:14px 0 0}
+
+  /* ============ PRICE — extras (base + tope + ejemplos) ============ */
+  .price-card .pincl{font-size:14px;font-weight:500;color:var(--camel);margin:8px 0 0}
+  .price-card .pbody{font-size:15px;line-height:1.55;color:var(--bone);margin:22px 0 0}
+  .price-card .pbody strong{color:var(--gold);font-weight:700}
+  .price-card .pexamples{display:flex;flex-direction:column;gap:9px;margin:20px 0 0;background:rgba(200,153,60,.08);border:1px solid rgba(200,153,60,.22);border-radius:12px;padding:14px 16px}
+  .price-card .pex{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+  .price-card .pex-case{font-size:13.5px;line-height:1.4;color:var(--bone);opacity:.85;text-align:left}
+  .price-card .pex-price{font-family:'Fraunces',serif;font-weight:600;font-size:16px;color:var(--gold);white-space:nowrap}
+  .price-card .pex-price em{font-style:normal;font-family:'Hanken Grotesk',sans-serif;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--camel);margin-left:3px}
+
+  /* ============ MODAL ============ */
+  .modal-overlay{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(15,12,10,.74);animation:rise .2s ease both}
+  .modal-card{position:relative;max-width:520px;width:100%;max-height:88vh;overflow-y:auto;background:radial-gradient(120% 90% at 50% 0%,#332a22 0%,#251f1a 58%,#1f1a15 100%);border:1.5px solid var(--gold);border-radius:22px;padding:38px 30px 32px;text-align:left;box-shadow:0 30px 80px -20px rgba(0,0,0,.7)}
+  .modal-card h3{font-family:'Fraunces',serif;font-weight:500;font-size:24px;color:var(--bone);margin:0 0 14px}
+  .modal-card p{font-size:14.5px;line-height:1.6;color:rgba(246,240,230,.82);margin:0 0 14px}
+  .modal-card ul{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:11px}
+  .modal-card li{position:relative;padding-left:20px;font-size:14px;line-height:1.55;color:rgba(246,240,230,.86)}
+  .modal-card li::before{content:"·";position:absolute;left:5px;top:-3px;color:var(--gold);font-weight:700;font-size:20px;line-height:1}
+  .modal-card b{color:var(--bone);font-weight:700}
+  .modal-card .modal-cond{border-top:1px solid rgba(216,185,138,.2);padding-top:16px}
+  .modal-card .modal-foot{color:var(--camel);font-size:13.5px;margin-bottom:0}
+  .modal-close{position:absolute;top:12px;right:14px;width:34px;height:34px;border:none;background:transparent;color:var(--camel);font-size:26px;line-height:1;cursor:pointer;border-radius:8px;transition:color .2s,background .2s}
+  .modal-close:hover{color:var(--bone);background:rgba(246,240,230,.06)}
+  .modal-close:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
   /* ============ FOOT ============ */
   .foot{padding:36px 0 44px;text-align:center;font-weight:600;font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);opacity:.6;background:#161210}
 </style>
@@ -152,7 +184,7 @@
   </div>
   <div class="kick">Para negocios argentinos</div>
   <h1 class="h1">El asistente que atiende tu WhatsApp — y suena <em>como vos</em>.</h1>
-  <p class="sub">Mientras trabajás, VOS responde. En tu voz, a cualquier hora. Vos decidís cuánto control mantener.</p>
+  <p class="sub">Mientras trabajás, VOS responde. En tu voz, a cualquier hora. Vos te metés cuando querés.</p>
   <div class="heroctas">
     <a class="btn btn-primary" href="#anotarme">Quiero que me avisen</a>
     <a class="btn btn-ghost" href="#como-funciona">Ver cómo funciona</a>
@@ -179,7 +211,7 @@
   <div class="container center">
     <div class="eyebrow">Para quién es VOS</div>
     <h2 class="stitle center">No sos una empresa grande. <em>Por eso lo hicimos así.</em></h2>
-    <p class="sdesc center">VOS es para el que atiende el negocio solo — o casi solo. El plomero, la panadera, el que muestra propiedades. Si tenés las manos ocupadas y el teléfono sonando, esto es para vos.</p>
+    <p class="sdesc center">VOS es para el que atiende el negocio solo — o casi solo. El gasista, la panadera, el que muestra propiedades. Si tenés las manos ocupadas y el teléfono sonando, esto es para vos.</p>
     <div class="whom-grid">
       <div class="whom-card">
         <div class="wnum">Gasista</div>
@@ -222,10 +254,35 @@
       </div>
       <div class="step">
         <div class="snum">Tres</div>
-        <h3>Vos decidís</h3>
-        <p>Empezá revisando cada respuesta antes de que salga. Cuando confíes, dejá que VOS conteste solo. El control es siempre tuyo.</p>
+        <h3>Vos tenés la última palabra</h3>
+        <p>Todo pasa en tu WhatsApp de siempre — lo ves en vivo. Si querés meterte, escribí nomás: VOS se hace a un lado y te deja seguir a vos. Cuando quieras que vuelva, se lo pedís.</p>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ============ TU NÚMERO, TU WHATSAPP ============ -->
+<section id="tu-numero">
+  <div class="container center">
+    <div class="eyebrow">Tu número, tu WhatsApp</div>
+    <h2 class="stitle center">No cambiás nada. <em>Solo dejás de perder clientes.</em></h2>
+    <p class="sdesc center">Seguís usando tu WhatsApp Business de siempre, en tu celular, con tu número de siempre y todos tus chats. No hay número nuevo, no hay que avisarle a nadie, no perdés tu historial. VOS contesta por vos cuando no llegás — y vos ves todo en tu teléfono, como siempre.</p>
+    <div class="trust-grid">
+      <div class="trust-item">
+        <h3>Tu número de siempre</h3>
+        <p>El que está en tu camioneta, en tus tarjetas, el que tus clientes ya tienen guardado. Ese mismo.</p>
+      </div>
+      <div class="trust-item">
+        <h3>Tu WhatsApp de siempre</h3>
+        <p>Seguís abriendo la misma app. Ves las conversaciones, ves lo que VOS contestó, y contestás vos cuando querés.</p>
+      </div>
+      <div class="trust-item">
+        <h3>Vos mandás, siempre</h3>
+        <p>Si escribís, VOS se hace a un lado y te deja seguir. Cuando quieras que vuelva, se lo pedís.</p>
+      </div>
+    </div>
+    <p class="coex-note center">Algunas funciones de WhatsApp cambian al conectar. <button type="button" class="infobtn" id="coexInfoBtn" aria-haspopup="dialog" aria-controls="coexModal" aria-label="Ver qué cambia en tu WhatsApp">i</button></p>
+    <p class="coex-fine center">Solo necesitás abrir tu WhatsApp cada tanto — como hacés todos los días igual.</p>
   </div>
 </section>
 
@@ -325,16 +382,22 @@
 <section id="precio">
   <div class="container center">
     <div class="eyebrow">Precio</div>
-    <h2 class="stitle center">Un solo plan. Sin letra chica.</h2>
-    <p class="sdesc center">No hay niveles confusos ni sorpresas en la factura. Un precio, todo incluido.</p>
+    <h2 class="stitle center">Pagás por lo que usás.</h2>
+    <p class="sdesc center">Sin niveles confusos. Una base baja, y después solo pagás las conversaciones que realmente tuviste.</p>
     <div class="price-card">
       <div class="pname">Plan VOS</div>
-      <div class="pnum">$45<span>&nbsp;USD / mes</span></div>
+      <div class="pnum">US$20<span>&nbsp;/ mes</span></div>
+      <div class="pincl">Incluye 50 conversaciones</div>
+      <p class="pbody">Después, pagás solo por conversación. Y <strong>nunca pagás más de US$99 por mes</strong>, pase lo que pase.</p>
+      <div class="pexamples">
+        <div class="pex"><span class="pex-case">Gasista, ~150 conversaciones/mes</span><span class="pex-price">US$29</span></div>
+        <div class="pex"><span class="pex-case">Inmobiliaria, ~2.000 conversaciones/mes</span><span class="pex-price">US$99 <em>tope</em></span></div>
+      </div>
       <ul class="plist">
-        <li><svg viewBox="0 0 20 20"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Tu número de WhatsApp Business dedicado</li>
+        <li><svg viewBox="0 0 20 20"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Tu número de siempre, tu WhatsApp de siempre</li>
         <li><svg viewBox="0 0 20 20"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Respuestas en la voz de tu negocio</li>
-        <li><svg viewBox="0 0 20 20"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Panel para revisar y aprobar respuestas</li>
-        <li><svg viewBox="0 0 20 20"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Modo automático cuando estés listo</li>
+        <li><svg viewBox="0 0 20 20"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Vos te metés cuando querés — VOS se hace a un lado</li>
+        <li><svg viewBox="0 0 20 20"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Modo vacaciones cuando no estás</li>
         <li><svg viewBox="0 0 20 20"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Tus datos, siempre tuyos</li>
       </ul>
       <a class="btn btn-primary" href="#anotarme">Quiero que me avisen</a>
@@ -364,6 +427,25 @@
     </div>
   </div>
 </section>
+
+<!-- ============ MODAL — QUÉ CAMBIA EN TU WHATSAPP ============ -->
+<div class="modal-overlay" id="coexModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="coexModalTitle">
+    <button type="button" class="modal-close" id="coexModalClose" aria-label="Cerrar">&times;</button>
+    <h3 id="coexModalTitle">Qué cambia en tu WhatsApp</h3>
+    <p>Al conectar VOS, algunas funciones de WhatsApp Business dejan de estar disponibles. La mayoría de los negocios no las usa, pero preferimos que lo sepas antes:</p>
+    <ul>
+      <li><b>Listas de difusión:</b> se desactivan (las que tengas quedan como solo lectura).</li>
+      <li><b>Ubicación en vivo:</b> no funciona.</li>
+      <li><b>Editar o borrar mensajes enviados:</b> no disponible.</li>
+      <li><b>Foto de perfil:</b> no se puede cambiar después de conectar (dejala como querés antes).</li>
+      <li><b>Grupos y llamadas:</b> siguen funcionando normal en tu app, pero VOS no participa.</li>
+      <li><b>WhatsApp para Windows:</b> no compatible.</li>
+    </ul>
+    <p class="modal-cond"><b>Y una condición importante:</b><br>Tenés que abrir tu WhatsApp Business al menos una vez cada 13 días. Si no, WhatsApp desconecta VOS automáticamente. Es una regla de WhatsApp, no nuestra.</p>
+    <p class="modal-foot">¿Dudas? Escribinos antes de conectar y te lo explicamos sin vueltas.</p>
+  </div>
+</div>
 
 <div class="foot">vos.chat · Virtual Operation System</div>
 
@@ -423,6 +505,35 @@
         btn.textContent = 'Avisame';
       });
     });
+  })();
+
+  // ── Modal "Qué cambia en tu WhatsApp" — abre desde el ⓘ ─────────────
+  (function () {
+    var openBtn = document.getElementById('coexInfoBtn');
+    var modal = document.getElementById('coexModal');
+    var closeBtn = document.getElementById('coexModalClose');
+    if (!openBtn || !modal || !closeBtn) return;
+    var lastFocus = null;
+
+    function onKey(e) { if (e.key === 'Escape' || e.key === 'Esc') close(); }
+    function open() {
+      lastFocus = document.activeElement;
+      modal.hidden = false;
+      document.body.style.overflow = 'hidden';
+      document.addEventListener('keydown', onKey);
+      closeBtn.focus();
+    }
+    function close() {
+      modal.hidden = true;
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', onKey);
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+
+    openBtn.addEventListener('click', open);
+    closeBtn.addEventListener('click', close);
+    // Click en el fondo (fuera de la card) cierra.
+    modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
   })();
 </script>
 </body>
