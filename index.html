@@ -144,11 +144,15 @@
   .price-card .pincl{font-size:14px;font-weight:500;color:var(--camel);margin:8px 0 0}
   .price-card .pbody{font-size:15px;line-height:1.55;color:var(--bone);margin:22px 0 0}
   .price-card .pbody strong{color:var(--gold);font-weight:700}
-  .price-card .pexamples{display:flex;flex-direction:column;gap:9px;margin:20px 0 0;background:rgba(200,153,60,.08);border:1px solid rgba(200,153,60,.22);border-radius:12px;padding:14px 16px}
-  .price-card .pex{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
-  .price-card .pex-case{font-size:13.5px;line-height:1.4;color:var(--bone);opacity:.85;text-align:left}
-  .price-card .pex-price{font-family:'Fraunces',serif;font-weight:600;font-size:16px;color:var(--gold);white-space:nowrap}
-  .price-card .pex-price em{font-style:normal;font-family:'Hanken Grotesk',sans-serif;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--camel);margin-left:3px}
+  .price-card .pexamples{display:flex;flex-direction:column;gap:8px;margin:20px 0 0;background:rgba(200,153,60,.08);border:1px solid rgba(200,153,60,.22);border-radius:12px;padding:13px 15px}
+  .price-card .pex{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  /* flex:1 + min-width:0 → the case fills the row and WRAPS within its own column
+     on narrow screens (never overflowing); the price stays pinned top-right. Flex
+     items default to min-width:auto = content size, which is what caused overflow. */
+  .price-card .pex-case{font-size:12.5px;line-height:1.5;color:var(--bone);opacity:.85;text-align:left;flex:1;min-width:0}
+  .price-card .pex-price{font-family:'Fraunces',serif;font-weight:600;font-size:14px;color:var(--gold);white-space:nowrap;text-align:right;flex-shrink:0}
+  /* "tope": minúscula, chico, pegado al US$99 — no un badge separado */
+  .price-card .pex-price em{font-style:normal;font-family:'Hanken Grotesk',sans-serif;font-size:10.5px;font-weight:600;color:var(--camel);margin-left:1px}
 
   /* ============ MODAL ============ */
   .modal-overlay{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(15,12,10,.74);animation:rise .2s ease both}
@@ -390,8 +394,8 @@
       <div class="pincl">Incluye 50 conversaciones</div>
       <p class="pbody">Después, pagás solo por conversación. Y <strong>nunca pagás más de US$99 por mes</strong>, pase lo que pase.</p>
       <div class="pexamples">
-        <div class="pex"><span class="pex-case">Gasista, ~150 conversaciones/mes</span><span class="pex-price">US$29</span></div>
-        <div class="pex"><span class="pex-case">Inmobiliaria, ~2.000 conversaciones/mes</span><span class="pex-price">US$99 <em>tope</em></span></div>
+        <div class="pex"><span class="pex-case">Gasista · 150 conversaciones</span><span class="pex-price">US$29</span></div>
+        <div class="pex"><span class="pex-case">Inmobiliaria · 2.000 conversaciones</span><span class="pex-price">US$99<em> tope</em></span></div>
       </div>
       <ul class="plist">
         <li><svg viewBox="0 0 20 20"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Tu número de siempre, tu WhatsApp de siempre</li>
