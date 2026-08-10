@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/:pageSlug", "destination": "/api/page?slug=:pageSlug" }
+  ]
+}
