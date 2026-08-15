@@ -1,0 +1,3 @@
+# Verificación local (node test/page.test.mjs). No es parte del sitio: sin esto
+# quedaría publicada en vos.chat/test/page.test.mjs.
+test/
