@@ -20,6 +20,8 @@
  *      — mejor una página de hace una hora que un error.
  */
 
+const { createHash } = require('node:crypto');
+
 const ENGINE = process.env.VOS_ENGINE_URL || 'https://vos-hnqb.onrender.com';
 const TTL_OK_MS = 5 * 60 * 1000;        // frescura normal
 const TTL_MISS_MS = 60 * 1000;          // 404: reintentar pronto (quizá publicó recién)
@@ -33,6 +35,63 @@ function esc(s) {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
+
+// ── Esquemas permitidos en un href (M-03) ────────────────────────────────────
+//
+// `esc()` impide ROMPER el atributo, pero no impide que el valor entero sea
+// `javascript:...`. Un dueño que escribe eso en el campo de sitio web publica en
+// vos.chat un link que ejecuta código al hacer clic. Y no es "se ataca a sí
+// mismo": todas las páginas viven bajo el MISMO origen, vos.chat/{slug}, así que
+// lo que se ejecute ahí comparte origen con las demás páginas y con todo lo que
+// vos.chat guarde en ese origen. Además el link se lo mandamos a SUS clientes.
+//
+// ALLOWLIST, NUNCA BLOCKLIST. Filtrar la cadena "javascript:" es la defensa que
+// se saltea con mayúsculas, espacios, tabs o saltos de línea — medido con el
+// parser nativo: `JaVaScRiPt:`, `java\nscript:` y ` javascript:` terminan los
+// tres en `protocol === 'javascript:'`. Parsear y aceptar sólo esquemas conocidos
+// no tiene esa clase de agujero, porque la pregunta se la contesta el mismo
+// parser que después va a usar el browser.
+//
+// Se devuelve `parsed.href` —la serialización canónica del parser— y no la
+// cadena original: lo que emitimos es exactamente lo que el parser leyó.
+
+/** Sitio web del negocio: lo tipea una persona. Ver `http:` en el PR. */
+const SCHEMES_WEBSITE = new Set(['https:', 'http:']);
+/** Links que arma una máquina (motor o Google Places): no hay caso http legítimo. */
+const SCHEMES_MACHINE = new Set(['https:']);
+/** Sólo para el link de teléfono. */
+const SCHEMES_TEL = new Set(['tel:']);
+
+/**
+ * URL absoluta y de esquema permitido, o `null`.
+ *
+ * `null` significa NO RENDERIZAR EL LINK — nunca un href vacío, un `#`, ni el
+ * valor mostrado igual sin enlazar el href. Un valor relativo (`misitio.com.ar`)
+ * tampoco pasa: `new URL()` lo rechaza, y enlazarlo apuntaría a vos.chat.
+ *
+ * @param {*} raw
+ * @param {Set<string>} allowed esquemas aceptados, con los dos puntos incluidos
+ * @returns {string|null}
+ */
+function safeHref(raw, allowed) {
+  if (typeof raw !== 'string') return null;
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  let parsed;
+  try {
+    parsed = new URL(trimmed);
+  } catch {
+    return null; // no parsea como URL absoluta
+  }
+  if (!allowed.has(parsed.protocol)) return null;
+  return parsed.href;
+}
+
+// Un handle de Instagram real es `[A-Za-z0-9._]`, hasta 30. Acá el esquema y el
+// host los ponemos nosotros, así que no hay riesgo de origen — pero un valor que
+// no es un handle sólo produce un link muerto, y un link muerto en la página de
+// un negocio es peor que no mostrar la fila.
+const INSTAGRAM_HANDLE = /^[A-Za-z0-9._]{1,30}$/;
 
 const FAVICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%2326201c'/%3E%3Cpath d='M20 8c7.2 0 13 4.5 13 10.1 0 5.6-5.8 10-13 10-1.6 0-3.2-.2-4.6-.6L8 31l1.7-5.2C7.7 24.1 6 21.4 6 18.1 6 12.5 12.8 8 20 8Z' fill='%23c8993c'/%3E%3Ccircle cx='14.4' cy='18.3' r='2.1' fill='%2326201c'/%3E%3Ccircle cx='20' cy='18.3' r='2.1' fill='%2326201c'/%3E%3Ccircle cx='25.6' cy='18.3' r='2.1' fill='%2326201c'/%3E%3C/svg%3E";
 
@@ -116,20 +175,40 @@ function buildJsonLd(page, url) {
   return JSON.stringify(ld).replace(/</g, '\\u003c');
 }
 
-function renderBusiness(page, url) {
+function renderBusiness(page, url, jsonLd = buildJsonLd(page, url)) {
   const c = page.contact || {};
   const infoRows = [];
-  if (c.address) infoRows.push(`<p>${esc(c.address)}${c.maps_uri ? ` · <a href="${esc(c.maps_uri)}" rel="noopener">Cómo llegar</a>` : ''}</p>`);
+  // Todo href que salga de datos del tenant pasa por safeHref(). Si no valida,
+  // la fila se renderiza SIN el link (o no se renderiza), nunca con un link roto.
+  const mapsHref = safeHref(c.maps_uri, SCHEMES_MACHINE);
+  const websiteHref = safeHref(c.website, SCHEMES_WEBSITE);
+  // El `tel:` lo componemos nosotros a partir de los dígitos del número; se
+  // valida igual, y sin un solo dígito no hay link que valga.
+  const telDigits = String(c.phone ?? '').replace(/[^+\d]/g, '');
+  const telHref = /\d/.test(telDigits) ? safeHref(`tel:${telDigits}`, SCHEMES_TEL) : null;
+  const igHandle = String(c.instagram ?? '').replace(/^@/, '');
+  const igHref = INSTAGRAM_HANDLE.test(igHandle) ? `https://instagram.com/${igHandle}` : null;
+
+  if (c.address) infoRows.push(`<p>${esc(c.address)}${mapsHref ? ` · <a href="${esc(mapsHref)}" rel="noopener">Cómo llegar</a>` : ''}</p>`);
   if (Array.isArray(c.hours)) for (const h of c.hours) infoRows.push(`<p>${esc(h)}</p>`);
-  if (c.phone) infoRows.push(`<p><a href="tel:${esc(String(c.phone).replace(/[^+\d]/g, ''))}">${esc(c.phone)}</a></p>`);
-  if (c.website) infoRows.push(`<p><a href="${esc(c.website)}" rel="noopener">${esc(String(c.website).replace(/^https?:\/\//, ''))}</a></p>`);
-  if (c.instagram) infoRows.push(`<p><a href="https://instagram.com/${esc(String(c.instagram).replace(/^@/, ''))}" rel="noopener">${esc(c.instagram)}</a></p>`);
+  // Sin href válido el teléfono se sigue MOSTRANDO: es un dato útil por sí solo
+  // y no depende de que se pueda enlazar.
+  if (c.phone) infoRows.push(`<p>${telHref ? `<a href="${esc(telHref)}">${esc(c.phone)}</a>` : esc(c.phone)}</p>`);
+  if (websiteHref) infoRows.push(`<p><a href="${esc(websiteHref)}" rel="noopener">${esc(String(c.website).replace(/^https?:\/\//, ''))}</a></p>`);
+  if (igHref) infoRows.push(`<p><a href="${esc(igHref)}" rel="noopener">${esc(c.instagram)}</a></p>`);
 
   const catalogRows = (Array.isArray(page.catalog) ? page.catalog : [])
     .map((p) => `<li><span>${esc(p.name)}</span>${p.price ? `<span class="p">${esc(p.price)}</span>` : ''}</li>`)
     .join('');
 
-  return `${head({ title: `${page.name} · WhatsApp`, description: buildDescription(page), url, jsonLd: buildJsonLd(page, url) })}
+  // wa_link lo ARMA EL MOTOR (`https://wa.me/${digits}` en business-page.js), no
+  // sale de la fila del tenant. Se valida igual: esta capa no confía en la de
+  // arriba, y si mañana ese link pasara a ser configurable el agujero ya está
+  // tapado. Sin link válido no hay barra de WhatsApp — mejor sin botón que con
+  // un botón que lleva a cualquier lado.
+  const waHref = safeHref(page.wa_link, SCHEMES_MACHINE);
+
+  return `${head({ title: `${page.name} · WhatsApp`, description: buildDescription(page), url, jsonLd })}
 <body>
 <main class="wrap">
   ${page.category ? `<p class="rubro">${esc(page.category)}</p>` : ''}
@@ -138,7 +217,7 @@ function renderBusiness(page, url) {
   ${infoRows.length ? `<section class="sec info"><h2>Dónde y cuándo</h2>${infoRows.join('')}</section>` : ''}
   <p class="foot">Atendemos por WhatsApp con <a href="https://vos.chat" rel="noopener">VOS</a>.</p>
 </main>
-${page.wa_link ? `<div class="wa-bar"><a class="wa-btn" href="${esc(page.wa_link)}" rel="noopener">${WA_ICON}Escribinos por WhatsApp</a></div>` : ''}
+${waHref ? `<div class="wa-bar"><a class="wa-btn" href="${esc(waHref)}" rel="noopener">${WA_ICON}Escribinos por WhatsApp</a></div>` : ''}
 </body>
 </html>`;
 }
@@ -171,6 +250,92 @@ function renderUnavailable() {
 </html>`;
 }
 
+// ── Headers de seguridad (mitad de B-03) ─────────────────────────────────────
+//
+// Se ponen acá, en la respuesta de esta función, y no en `vercel.json`: eso
+// alcanzaría también a index.html y a los videos, que son otra superficie y otra
+// decisión. Acá el alcance es exactamente la página pública de un negocio.
+//
+// La CSP describe lo que la página REALMENTE usa hoy, nada más:
+//   default-src 'none'  — nada está permitido salvo lo que se nombra abajo.
+//   style-src           — el <style> inline con BASE_CSS, más la hoja de Google
+//                         Fonts. 'unsafe-inline' y no un hash: el hash de un CSS
+//                         constante se rompe en silencio con cualquier retoque
+//                         de estilo, y acá no hay CSS que venga del tenant.
+//   font-src            — los .woff2 de Google Fonts salen de otro host.
+//   img-src data:       — el favicon es un data: URI; no hay <img> en la página
+//                         (el ícono de WhatsApp es un <svg> inline).
+//   script-src          — la página no corre una sola línea de JavaScript, así
+//                         que 'none'. La única excepción es el HASH del bloque
+//                         JSON-LD. Según la spec un `type="application/ld+json"`
+//                         es un data block y ni siquiera llega al chequeo de
+//                         CSP, pero los browsers no siempre coincidieron y la
+//                         propia documentación de Google recomienda nonce o
+//                         hash. No pude medirlo en un browser en esta máquina,
+//                         y romper el structured data —la razón por la que esta
+//                         función existe— se nota tarde y mal. Con el hash la
+//                         pregunta desaparece: vale bajo cualquier lectura.
+//                         Hash y no nonce, porque la respuesta la cachea el CDN
+//                         5 minutos: un nonce compartido por miles de visitas
+//                         deja de ser impredecible, un hash sigue autorizando
+//                         exactamente ese contenido y nada más.
+//   frame-ancestors / X-Frame-Options — que nadie la meta en un iframe para
+//                         disfrazarla de otra cosa; el link se lo mandamos a los
+//                         clientes del negocio.
+//   base-uri / form-action 'none' — no hay <base> ni formularios, y sin esto un
+//                         <base> inyectado repuntaría los links relativos.
+//
+// Los <a> a sitios externos son NAVEGACIÓN, no subrecurso: ninguna directiva de
+// fetch los alcanza. Por eso el arreglo de los href es el que protege ahí, y la
+// CSP es la segunda línea, no la primera.
+function buildCsp(scriptSrc) {
+  return [
+    "default-src 'none'",
+    "style-src 'unsafe-inline' https://fonts.googleapis.com",
+    'font-src https://fonts.gstatic.com',
+    'img-src data:',
+    `script-src ${scriptSrc}`,
+    "form-action 'none'",
+    "base-uri 'none'",
+    "frame-ancestors 'none'",
+  ].join('; ');
+}
+
+/** CSP de las páginas sin JSON-LD (404, 503): ningún script, de ningún tipo. */
+const CSP = buildCsp("'none'");
+
+/** `'sha256-…'` del contenido EXACTO del bloque JSON-LD que se va a emitir. */
+function jsonLdHash(jsonLd) {
+  return `'sha256-${createHash('sha256').update(jsonLd, 'utf8').digest('base64')}'`;
+}
+
+/**
+ * @param {object} res
+ * @param {string|null} jsonLd contenido literal del bloque JSON-LD, si la
+ *   respuesta lo lleva. Se vuelve a llamar sobre la misma `res` en el camino de
+ *   la página de negocio: `setHeader` pisa el valor anterior.
+ */
+function setSecurityHeaders(res, jsonLd = null) {
+  res.setHeader('Content-Security-Policy', jsonLd ? buildCsp(jsonLdHash(jsonLd)) : CSP);
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  // La página enlaza al sitio del negocio: no hace falta contarle el path
+  // completo desde el que salió el clic.
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+}
+
+/**
+ * Única salida de una página de negocio. El bloque JSON-LD se construye UNA vez
+ * y la misma cadena va al HTML y al hash de la CSP — si se construyera dos veces
+ * bastaría un espacio de diferencia para que el hash no cierre.
+ */
+function sendBusiness(res, page, url, cacheControl) {
+  const jsonLd = buildJsonLd(page, url);
+  setSecurityHeaders(res, jsonLd);
+  res.setHeader('Cache-Control', cacheControl);
+  return res.status(200).send(renderBusiness(page, url, jsonLd));
+}
+
 async function fetchPage(slug) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
@@ -189,6 +354,9 @@ async function fetchPage(slug) {
 module.exports = async (req, res) => {
   const raw = String((req.query && req.query.slug) || '').toLowerCase();
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  // En TODAS las respuestas de esta función, incluidas la de 404 y la de 503:
+  // son la misma superficie HTML y el mismo origen.
+  setSecurityHeaders(res);
 
   // Slug inválido ≡ inexistente, misma página, sin tocar el motor.
   if (!/^[a-z0-9-]{3,60}$/.test(raw)) {
@@ -202,17 +370,15 @@ module.exports = async (req, res) => {
 
   // Frescura en memoria (instancia caliente): ni motor ni CDN.
   if (cached && now - cached.at < (cached.status === 200 ? TTL_OK_MS : TTL_MISS_MS)) {
-    res.setHeader('Cache-Control', cached.status === 200 ? 'public, s-maxage=300, stale-while-revalidate=600' : 'public, s-maxage=60');
-    return res.status(cached.status).send(cached.status === 200 ? renderBusiness(cached.page, url) : renderNotFound());
+    if (cached.status === 200) return sendBusiness(res, cached.page, url, 'public, s-maxage=300, stale-while-revalidate=600');
+    res.setHeader('Cache-Control', 'public, s-maxage=60');
+    return res.status(404).send(renderNotFound());
   }
 
   try {
     const r = await fetchPage(raw);
     cache.set(raw, { at: now, ...r });
-    if (r.status === 200) {
-      res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
-      return res.status(200).send(renderBusiness(r.page, url));
-    }
+    if (r.status === 200) return sendBusiness(res, r.page, url, 'public, s-maxage=300, stale-while-revalidate=600');
     // 404 con caché corta: si el negocio publica recién, lo ve en ~1 min.
     res.setHeader('Cache-Control', 'public, s-maxage=60');
     return res.status(404).send(renderNotFound());
@@ -220,10 +386,18 @@ module.exports = async (req, res) => {
     // Motor caído o lento. Copia vieja (hasta 24 h) antes que un error: los
     // datos de un negocio cambian poco y el link lo abre un cliente final.
     if (cached && cached.status === 200 && now - cached.at < STALE_RESCUE_MS) {
-      res.setHeader('Cache-Control', 'public, s-maxage=60');
-      return res.status(200).send(renderBusiness(cached.page, url));
+      return sendBusiness(res, cached.page, url, 'public, s-maxage=60');
     }
     res.setHeader('Cache-Control', 'no-store');
     return res.status(503).send(renderUnavailable());
   }
+};
+
+// Para `test/page.test.mjs`, que corre con node pelado. Se cuelgan como
+// propiedades del handler para que `module.exports` siga siendo la función que
+// Vercel espera, y para no partir el archivo en módulos que el bundler tenga que
+// rastrear. No las use nadie más.
+module.exports.__internals = {
+  safeHref, renderBusiness, setSecurityHeaders, sendBusiness, buildJsonLd, buildCsp, jsonLdHash,
+  SCHEMES_WEBSITE, SCHEMES_MACHINE, SCHEMES_TEL, CSP,
 };
