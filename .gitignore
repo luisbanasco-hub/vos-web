@@ -5,3 +5,12 @@ node_modules/
 .env.*
 # OS
 .DS_Store
+
+# Secretos (B-04) — cualquier variante de .env y credenciales sueltas
+.env*
+!.env.example
+secrets.json
+service-account*.json
+*.pem
+*.p12
+id_rsa*
