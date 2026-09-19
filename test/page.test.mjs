@@ -217,6 +217,130 @@ section('CSP · el hash del JSON-LD corresponde al bloque emitido');
   check(headers['X-Frame-Options'] === 'DENY', 'los headers de seguridad también van en esta salida');
 }
 
+// ══════════════════════════════════════════════════════════════
+section('HANDLER · manejo de errores (H1)');
+// ══════════════════════════════════════════════════════════════
+// El handler exportado no se probaba: ni la caché, ni el 404/503, ni la forma
+// del body del motor — exactamente donde vivía H1. Se prueba SIN RED: el motor
+// es un `fetch` stubbeado y el reloj se controla con `Date.now`, así esto sigue
+// corriendo con node pelado y sin levantar nada.
+{
+  const handler = require(join(ROOT, 'api', 'page.js'));
+  const cache = __internals.cache;
+
+  const realFetch = globalThis.fetch;
+  const realNow = Date.now;
+  const realErr = console.error;
+
+  /** Una `res` con la misma superficie que usa el handler. */
+  function fakeRes() {
+    return {
+      headers: {}, code: null, body: '',
+      setHeader(k, v) { this.headers[k] = v; },
+      status(c) { this.code = c; return this; },
+      send(html) { this.body = html; return this; },
+    };
+  }
+
+  /** Corre el handler con un motor falso, un reloj fijo y los logs capturados. */
+  async function call(slug, fetchImpl, at) {
+    const logs = [];
+    globalThis.fetch = fetchImpl;
+    Date.now = () => at;
+    console.error = (line) => logs.push(String(line));
+    const res = fakeRes();
+    let threw = null;
+    try { await handler({ query: { slug } }, res); } catch (e) { threw = e; }
+    console.error = realErr;
+    Date.now = realNow;
+    globalThis.fetch = realFetch;
+    return { res, logs, threw, log: logs.length === 1 ? JSON.parse(logs[0]) : null };
+  }
+
+  const motorOk = (page) => async () => ({ status: 200, ok: true, json: async () => ({ ok: true, page }) });
+  const motorBody = (body) => async () => ({ status: 200, ok: true, json: async () => body });
+  const motorCaido = async () => { throw new Error('connect ECONNREFUSED 127.0.0.1:9'); };
+  const motor404 = async () => ({ status: 404, ok: false });
+
+  const T0 = 1700000000000;
+  const MIN = 60 * 1000;
+  const PAGINA = { name: 'Café Luna', wa_link: 'https://wa.me/5491155554444', catalog: [{ name: 'Flat white' }] };
+
+  // ── Un 200 con otra forma NO es un 404, y no pisa la copia de rescate ──────
+  {
+    let r = await call('negocio-a', motorOk(PAGINA), T0);
+    check(r.res.code === 200, 'setup · el motor contesta bien y la página sale 200');
+
+    r = await call('negocio-a', motorBody({}), T0 + 6 * MIN);
+    check(r.res.code !== 404, 'body inesperado → NO se responde 404 (antes: "Acá no hay nada" sobre un negocio que existe)');
+    check(r.res.code === 200, 'se sirve la copia de rescate en su lugar');
+    check(cache.get('negocio-a') && cache.get('negocio-a').status === 200 && cache.get('negocio-a').at === T0,
+      'y la entrada 200 del Map queda INTACTA — el fallo no la pisa');
+    check(r.log && r.log.step === 'engine_shape', 'queda logueado, y distingue "cambió el contrato" de "se cayó"');
+    check(r.log && r.log.served === 'stale', 'el log dice qué se terminó sirviendo');
+
+    r = await call('negocio-a', motorCaido, T0 + 7 * MIN);
+    check(r.res.code === 200, 'y si DESPUÉS se cae el motor, el rescate sigue existiendo (antes: 503, la copia ya estaba pisada)');
+    check(r.log && r.log.step === 'engine_fetch', 'la caída se loguea como otro paso distinto');
+  }
+
+  // ── Un 404 REAL sí reemplaza la copia: despublicar tiene que funcionar ─────
+  {
+    let r = await call('negocio-b', motorOk(PAGINA), T0);
+    check(r.res.code === 200, 'setup · negocio publicado');
+
+    r = await call('negocio-b', motor404, T0 + 6 * MIN);
+    check(r.res.code === 404, 'un 404 real del motor sí responde 404');
+    check(cache.get('negocio-b').status === 404, 'y sí reemplaza la copia de rescate (asimetría deliberada con el caso de arriba)');
+
+    r = await call('negocio-b', motorCaido, T0 + 8 * MIN);
+    check(r.res.code === 503, 'con el motor caído, una página despublicada NO reaparece desde la caché');
+  }
+
+  // ── Render roto: 500 controlado en AMBAS visitas, y sin envenenar el Map ───
+  {
+    const ROTA = { name: 'X', wa_link: 'https://wa.me/5491155554444', catalog: [null] };
+
+    let r = await call('negocio-c', motorOk(ROTA), T0);
+    check(r.threw === null, '1ª visita · un render que explota NO escapa como excepción');
+    check(r.res.code === 500, 'sale 500 controlado, no el 503 de "motor caído" (que mandaría a mirar el lugar equivocado)');
+    check(r.res.headers['Cache-Control'] === 'no-store', 'y no se cachea');
+    check(/script-src 'none'/.test(r.res.headers['Content-Security-Policy']), 'con la CSP estricta, sin el hash de un JSON-LD que no se emitió');
+    check(r.log && r.log.step === 'render', 'logueado como fallo de render');
+    check(!cache.has('negocio-c'), 'la página que no se puede dibujar NO entra al Map');
+
+    r = await call('negocio-c', motorOk(ROTA), T0 + 1000);
+    check(r.threw === null && r.res.code === 500,
+      '2ª visita · también 500 controlado (antes: excepción no manejada fuera del try → 500 genérico de Vercel, cero logs)');
+  }
+
+  // ── Todo fallo deja traza, y ninguna traza lleva datos del negocio ─────────
+  {
+    let r = await call('negocio-d', motorCaido, T0);
+    check(r.res.code === 503, 'motor caído sin copia previa → 503');
+    check(r.logs.length === 1, 'y queda UNA línea en el log (antes: cero, el catch era mudo)');
+    check(r.log.slug === 'negocio-d' && r.log.step === 'engine_fetch' && r.log.served === '503',
+      'con el slug, el paso que falló y qué se sirvió');
+    check(Object.keys(r.log).sort().join(',') === 'err,evt,msg,served,slug,step',
+      'exactamente esos campos: ni stack, ni body del motor, ni objeto page');
+
+    const CON_PII = {
+      name: 'Café Luna', wa_link: 'https://wa.me/5491155554444',
+      contact: { phone: '+54 9 11 5555-4444', address: 'Av. Siempreviva 742' },
+      catalog: [null],
+    };
+    r = await call('negocio-e', motorOk(CON_PII), T0);
+    const todo = r.logs.join('\n');
+    check(r.res.code === 500, 'setup · esa página explota al renderizar');
+    check(!/5555-4444/.test(todo) && !/Siempreviva/.test(todo) && !/Café Luna/.test(todo),
+      'NINGÚN dato del negocio (teléfono, dirección, nombre) aparece en el log');
+    check(/negocio-e/.test(todo), 'pero el slug sí: es público y sin él no se sabe qué negocio se cayó');
+
+    r = await call('negocio-f', motorOk(PAGINA), T0);
+    check(r.res.code === 200 && r.logs.length === 0, 'el camino feliz no ensucia los logs');
+  }
+}
+
 // ── Veredicto ────────────────────────────────────────────────
 section('VEREDICTO');
 const ok = failed === 0;

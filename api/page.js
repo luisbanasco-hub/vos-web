@@ -325,15 +325,95 @@ function setSecurityHeaders(res, jsonLd = null) {
 }
 
 /**
- * Única salida de una página de negocio. El bloque JSON-LD se construye UNA vez
- * y la misma cadena va al HTML y al hash de la CSP — si se construyera dos veces
- * bastaría un espacio de diferencia para que el hash no cierre.
+ * Arma la página de un negocio SIN tocar `res`. Todo lo que puede explotar
+ * —construir el JSON-LD, renderizar el HTML— ocurre acá, ANTES de escribir un
+ * solo header: si falla, la respuesta sigue limpia y el que llama decide qué
+ * mandar. Antes el render se evaluaba como argumento de `.send()`, después de
+ * `res.status(200)`, así que un dato raro dejaba la respuesta a medio armar.
+ *
+ * El bloque JSON-LD se construye UNA vez y la misma cadena va al HTML y al hash
+ * de la CSP — si se construyera dos veces bastaría un espacio de diferencia para
+ * que el hash no cierre.
  */
-function sendBusiness(res, page, url, cacheControl) {
+function buildBusinessPage(page, url) {
   const jsonLd = buildJsonLd(page, url);
-  setSecurityHeaders(res, jsonLd);
+  return { jsonLd, html: renderBusiness(page, url, jsonLd) };
+}
+
+/** Manda una página ya armada. No puede fallar por los datos del negocio. */
+function sendBuilt(res, built, cacheControl) {
+  setSecurityHeaders(res, built.jsonLd);
   res.setHeader('Cache-Control', cacheControl);
-  return res.status(200).send(renderBusiness(page, url, jsonLd));
+  return res.status(200).send(built.html);
+}
+
+/** Única salida de una página de negocio: armar y mandar. */
+function sendBusiness(res, page, url, cacheControl) {
+  return sendBuilt(res, buildBusinessPage(page, url), cacheControl);
+}
+
+// ── Errores propios y logging (H1) ───────────────────────────────────────────
+//
+// Antes TODO fallo —motor caído, motor con otro contrato, bug de render— caía en
+// el mismo `catch` vacío: cero líneas en los logs de Vercel y tres causas
+// distintas disfrazadas de la misma respuesta. Acá se separan, porque se
+// arreglan distinto: el motor caído se espera y pasa, un cambio de contrato hay
+// que ir a mirarlo, y un render roto es un bug nuestro.
+
+/**
+ * El motor contestó 200 pero el body no tiene la forma `{ ok, page }`.
+ *
+ * Se distingue de un 404 A PROPÓSITO. Un 404 es información sobre el negocio
+ * ("no existe" / "no está publicada"); un body que no entendemos no dice nada
+ * sobre el negocio, dice que dejamos de entendernos con el motor. Tratarlo como
+ * 404 —lo que se hacía— publicaba "acá no hay nada" sobre un negocio que existe
+ * y, peor, pisaba en la caché la última copia buena que teníamos de él.
+ */
+class EngineShapeError extends Error {
+  constructor() {
+    super('el motor contestó 200 con un body sin { ok, page }');
+    this.name = 'EngineShapeError';
+  }
+}
+
+/**
+ * Una línea JSON por fallo, a stderr, que es lo que indexan los logs de Vercel.
+ *
+ * NUNCA se loguea el body del motor ni el objeto `page`: ahí viven el teléfono,
+ * la dirección y el WhatsApp del negocio. El `slug` SÍ, porque es el segmento
+ * público de la URL (`^[a-z0-9-]{3,60}$`, ya validado cuando se llega acá) y sin
+ * él un error en el log no dice QUÉ negocio se cayó, que es exactamente lo que
+ * hace falta saber para arreglarlo.
+ */
+function logFailure(fields) {
+  try {
+    console.error(JSON.stringify({ evt: 'vos-web.page.fail', ...fields }));
+  } catch {
+    // Un fallo al loguear jamás puede tumbar la respuesta del visitante.
+  }
+}
+
+/** Nombre y mensaje del error, recortados. Sin stack y sin datos del tenant. */
+function describeError(err) {
+  if (!(err instanceof Error)) return { err: 'NonError', msg: String(err ?? '').slice(0, 200) };
+  return { err: err.name || 'Error', msg: String(err.message ?? '').slice(0, 200) };
+}
+
+/**
+ * Falla de RENDER: el motor contestó bien y nosotros no supimos dibujar esos
+ * datos. Es un bug nuestro, así que sale 500 —y no el 503 de "motor caído", que
+ * sería mentira y mandaría a mirar el lugar equivocado— y queda registrado.
+ *
+ * Lo importante es que NO escape como excepción: fuera del `try` del handler,
+ * una excepción es un 500 genérico de Vercel sin una sola línea que diga qué
+ * negocio ni por qué.
+ */
+function sendRenderFailure(res, slug, err, step) {
+  logFailure({ step, slug, served: '500', ...describeError(err) });
+  // CSP estricta acá, sin depender de por qué camino se llegó.
+  setSecurityHeaders(res);
+  res.setHeader('Cache-Control', 'no-store');
+  return res.status(500).send(renderUnavailable());
 }
 
 async function fetchPage(slug) {
@@ -344,7 +424,9 @@ async function fetchPage(slug) {
     if (r.status === 404) return { status: 404 };
     if (!r.ok) throw new Error(`engine ${r.status}`);
     const body = await r.json();
-    if (!body?.ok || !body.page) return { status: 404 };
+    // Un body inesperado NO es un 404: se trata como falla del motor, así entra
+    // en juego el rescate stale y la copia buena no se toca. Ver EngineShapeError.
+    if (!body?.ok || !body.page) throw new EngineShapeError();
     return { status: 200, page: body.page, publishedAt: body.published_at ?? null };
   } finally {
     clearTimeout(timer);
@@ -370,27 +452,67 @@ module.exports = async (req, res) => {
 
   // Frescura en memoria (instancia caliente): ni motor ni CDN.
   if (cached && now - cached.at < (cached.status === 200 ? TTL_OK_MS : TTL_MISS_MS)) {
-    if (cached.status === 200) return sendBusiness(res, cached.page, url, 'public, s-maxage=300, stale-while-revalidate=600');
+    if (cached.status !== 200) {
+      res.setHeader('Cache-Control', 'public, s-maxage=60');
+      return res.status(404).send(renderNotFound());
+    }
+    try {
+      return sendBusiness(res, cached.page, url, 'public, s-maxage=300, stale-while-revalidate=600');
+    } catch (err) {
+      // Estructuralmente no debería pasar: al Map sólo entran páginas que YA se
+      // renderizaron bien una vez (más abajo). Si igual ocurre, la entrada se
+      // descarta para que la próxima visita vuelva a preguntarle al motor en vez
+      // de repetir el mismo 500 durante los 5 minutos del TTL.
+      cache.delete(raw);
+      return sendRenderFailure(res, raw, err, 'render_cached');
+    }
+  }
+
+  let fetched;
+  try {
+    fetched = await fetchPage(raw);
+  } catch (err) {
+    // Motor caído, lento, o hablando otro contrato. En NINGUNO de esos casos se
+    // toca el Map: la copia vieja es exactamente lo que salva a este negocio, y
+    // pisarla con el resultado de un fallo es perder la red justo cuando se cae.
+    const step = err instanceof EngineShapeError ? 'engine_shape' : 'engine_fetch';
+    if (cached && cached.status === 200 && now - cached.at < STALE_RESCUE_MS) {
+      // Copia vieja (hasta 24 h) antes que un error: los datos de un negocio
+      // cambian poco y el link lo abre un cliente final.
+      logFailure({ step, slug: raw, served: 'stale', stale_age_s: Math.round((now - cached.at) / 1000), ...describeError(err) });
+      try {
+        return sendBusiness(res, cached.page, url, 'public, s-maxage=60');
+      } catch (renderErr) {
+        return sendRenderFailure(res, raw, renderErr, 'render_stale');
+      }
+    }
+    logFailure({ step, slug: raw, served: '503', ...describeError(err) });
+    res.setHeader('Cache-Control', 'no-store');
+    return res.status(503).send(renderUnavailable());
+  }
+
+  if (fetched.status !== 200) {
+    // 404 REAL del motor: no existe o no está publicada. Acá sí se pisa la copia
+    // de rescate, y debe pisarse — si el dueño despublicó, seguir sirviendo la
+    // copia vieja cuando el motor se caiga sería volver a publicar lo que pidió
+    // bajar. Caché corta: si publica recién, lo ve en ~1 min.
+    cache.set(raw, { at: now, status: 404 });
     res.setHeader('Cache-Control', 'public, s-maxage=60');
     return res.status(404).send(renderNotFound());
   }
 
+  // Se RENDERIZA ANTES DE CACHEAR. Si entrara al Map una página que explota al
+  // dibujarse, reemplazaría a la copia buena anterior Y la visita siguiente
+  // —que sale por el camino de caché, sin volver a preguntarle al motor—
+  // heredaría el mismo 500 sin forma de recuperarse sola.
+  let built;
   try {
-    const r = await fetchPage(raw);
-    cache.set(raw, { at: now, ...r });
-    if (r.status === 200) return sendBusiness(res, r.page, url, 'public, s-maxage=300, stale-while-revalidate=600');
-    // 404 con caché corta: si el negocio publica recién, lo ve en ~1 min.
-    res.setHeader('Cache-Control', 'public, s-maxage=60');
-    return res.status(404).send(renderNotFound());
-  } catch {
-    // Motor caído o lento. Copia vieja (hasta 24 h) antes que un error: los
-    // datos de un negocio cambian poco y el link lo abre un cliente final.
-    if (cached && cached.status === 200 && now - cached.at < STALE_RESCUE_MS) {
-      return sendBusiness(res, cached.page, url, 'public, s-maxage=60');
-    }
-    res.setHeader('Cache-Control', 'no-store');
-    return res.status(503).send(renderUnavailable());
+    built = buildBusinessPage(fetched.page, url);
+  } catch (err) {
+    return sendRenderFailure(res, raw, err, 'render');
   }
+  cache.set(raw, { at: now, status: 200, page: fetched.page, publishedAt: fetched.publishedAt });
+  return sendBuilt(res, built, 'public, s-maxage=300, stale-while-revalidate=600');
 };
 
 // Para `test/page.test.mjs`, que corre con node pelado. Se cuelgan como
@@ -398,6 +520,6 @@ module.exports = async (req, res) => {
 // Vercel espera, y para no partir el archivo en módulos que el bundler tenga que
 // rastrear. No las use nadie más.
 module.exports.__internals = {
-  safeHref, renderBusiness, setSecurityHeaders, sendBusiness, buildJsonLd, buildCsp, jsonLdHash,
-  SCHEMES_WEBSITE, SCHEMES_MACHINE, SCHEMES_TEL, CSP,
+  safeHref, renderBusiness, setSecurityHeaders, sendBusiness, buildBusinessPage, buildJsonLd, buildCsp, jsonLdHash,
+  SCHEMES_WEBSITE, SCHEMES_MACHINE, SCHEMES_TEL, CSP, EngineShapeError, cache,
 };
