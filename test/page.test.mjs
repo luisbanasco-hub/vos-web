@@ -1,6 +1,7 @@
 /**
- * Verificación de `api/page.js` — M-03: allowlist de esquemas en los href, y los
- * headers de seguridad de la respuesta.
+ * Verificación de `api/page.js` y de la configuración del sitio: allowlist de
+ * esquemas en los href, manejo de errores del handler, ruteo y los headers de
+ * seguridad, tanto los de la respuesta de la función como los de vercel.json.
  *
  * El repo no tiene infraestructura de tests ni package.json: esto corre con node
  * pelado, sin dependencias y sin instalar nada.
@@ -444,6 +445,83 @@ section('RUTEO · vercel.json resuelve las estáticas antes del catch-all');
     check(rewrites[i] && rewrites[i].destination === `/${pagina}.html`, `que apunta al archivo estático, no al motor`);
   }
   check(iCatchAll === rewrites.length - 1, 'el catch-all queda último, que es el único lugar donde puede estar');
+}
+
+// ══════════════════════════════════════════════════════════════
+section('ESTÁTICAS · headers de seguridad (H4, la otra mitad de B-03)');
+// ══════════════════════════════════════════════════════════════
+// `index.html`, `privacidad.html` y `terminos.html` salían sin un solo header
+// de seguridad: la función los ponía sólo para la página de negocio. La landing
+// tiene un formulario con datos de personas y JavaScript inline.
+{
+  const vercel = JSON.parse(readFileSync(join(ROOT, 'vercel.json'), 'utf8'));
+  const reglas = vercel.headers || [];
+  const valor = (regla, key) => (regla.headers.find((h) => h.key === key) || {}).value;
+
+  check(reglas.length > 0, 'vercel.json tiene bloque headers (antes: ninguno)');
+
+  // El ALCANCE es lo delicado: un `source` de `/(.*)` alcanzaría también a
+  // /api/page, y su CSP fija pisaría la que la función construye con el hash
+  // del bloque JSON-LD — o sea, rompería el structured data, que es la razón
+  // por la que esa función existe. Por eso los sources se enumeran.
+  const fuentes = reglas.map((r) => r.source).sort();
+  check(!fuentes.some((f) => f === '/(.*)' || f === '/:path*' || f === '/(.*)?'),
+    'ninguna regla usa un catch-all: no puede alcanzar a /api/page ni pisarle la CSP');
+  check(fuentes.join(' | ') === '/ | /(index.html|privacidad|privacidad.html|terminos|terminos.html) | /videos/(.*)',
+    `los sources son exactamente los paths estáticos de este repo (${fuentes.join(' | ')})`);
+
+  const documentos = reglas.filter((r) => valor(r, 'Content-Security-Policy'));
+  check(documentos.length === 2, 'las dos reglas de documentos llevan CSP; la de /videos/ no (no es un documento)');
+
+  for (const r of reglas) {
+    check(valor(r, 'X-Frame-Options') === 'DENY', `${r.source} · X-Frame-Options: DENY`);
+    check(valor(r, 'X-Content-Type-Options') === 'nosniff', `${r.source} · X-Content-Type-Options: nosniff`);
+    check(valor(r, 'Referrer-Policy') === 'strict-origin-when-cross-origin', `${r.source} · Referrer-Policy`);
+  }
+
+  const CSP_EST = valor(documentos[0], 'Content-Security-Policy');
+  check(documentos.every((r) => valor(r, 'Content-Security-Policy') === CSP_EST),
+    'las dos reglas de documentos llevan LA MISMA CSP: / y /index.html no pueden divergir');
+  check(/default-src 'none'/.test(CSP_EST), 'la CSP estática arranca cerrada');
+  check(/frame-ancestors 'none'/.test(CSP_EST), "frame-ancestors 'none'");
+  check(/base-uri 'none'/.test(CSP_EST), "base-uri 'none': un <base> inyectado repuntaría los links relativos");
+  check(/form-action 'self'/.test(CSP_EST),
+    "form-action 'self': el <form> de la waitlist no tiene action y lo manda JavaScript, pero si el JS no corre el submit nativo no puede salir del origen");
+
+  // ── Acoplamiento: la CSP tiene que cubrir lo que las páginas PIDEN de verdad.
+  // Este es el check que importa: si mañana alguien agrega un script, una
+  // tipografía o un iframe de otro host y no toca la CSP, esto falla acá y no
+  // en producción con la página rota.
+  const PAGINAS = ['index.html', 'privacidad.html', 'terminos.html'];
+  const externos = new Set();
+  let inlineScript = false;
+  let inlineStyle = false;
+  let media = false;
+  for (const f of PAGINAS) {
+    const html = readFileSync(join(ROOT, f), 'utf8');
+    // SUBRECURSOS (lo que el browser baja), no <a href>, que es navegación y
+    // ninguna directiva de fetch alcanza.
+    for (const m of html.matchAll(/<(?:link|script|img|source|iframe)\b[^>]*\b(?:href|src)="(https?:\/\/[^"]+)"/g)) {
+      externos.add(new URL(m[1]).origin);
+    }
+    if (/<script>/.test(html)) inlineScript = true;
+    if (/<style>/.test(html) || / style="/.test(html)) inlineStyle = true;
+    if (/<source\b[^>]*\bsrc="(?!https?:)/.test(html)) media = true;
+  }
+  check(externos.size > 0, `las páginas piden ${externos.size} origen(es) externo(s): ${[...externos].join(', ')}`);
+  for (const origen of externos) {
+    check(CSP_EST.includes(origen), `${origen} está contemplado en la CSP estática`);
+  }
+  check(!inlineScript || /script-src[^;]*'unsafe-inline'/.test(CSP_EST),
+    "hay <script> inline, así que script-src lo permite ('unsafe-inline'; un hash se rompe en silencio con cualquier retoque del formulario)");
+  check(!inlineStyle || /style-src[^;]*'unsafe-inline'/.test(CSP_EST), 'hay estilos inline y style-src los permite');
+  check(!media || /media-src 'self'/.test(CSP_EST), "el <video> es local, así que media-src 'self'");
+  check(/img-src[^;]*data:/.test(CSP_EST) && /img-src[^;]*'self'/.test(CSP_EST),
+    "img-src cubre el favicon data: y el poster local del video");
+  check(/connect-src 'self'/.test(CSP_EST),
+    "connect-src 'self': alcanza porque el formulario postea a /api/waitlist (H2). Si volviera a pegarle directo a Supabase, la CSP lo bloquearía");
+  check(/script-src[^;]*'self'/.test(CSP_EST),
+    "script-src incluye 'self': hoy no hay scripts externos, pero si el proyecto tiene Vercel Analytics, Vercel inyecta uno del mismo origen");
 }
 
 // ── Veredicto ────────────────────────────────────────────────
