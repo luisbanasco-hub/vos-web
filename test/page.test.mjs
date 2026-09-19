@@ -14,6 +14,7 @@
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { readFileSync } from 'node:fs';
 
 const require = createRequire(import.meta.url);
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -382,6 +383,67 @@ section('HANDLER · manejo de errores (H1)');
     r = await call('negocio-f', motorOk(PAGINA), T0);
     check(r.res.code === 200 && r.logs.length === 0, 'el camino feliz no ensucia los logs');
   }
+}
+
+// ══════════════════════════════════════════════════════════════
+section('RUTEO · el motor no recibe consultas por paths de vos.chat (H3)');
+// ══════════════════════════════════════════════════════════════
+// El catch-all `/:pageSlug` manda a esta función CUALQUIER URL de un segmento.
+// `/privacidad` y `/terminos` terminaban preguntándole al motor por un tenant
+// llamado "privacidad", y publicando "Acá no hay nada" en la página de política
+// de privacidad — la misma URL que se carga en el App Review de Meta.
+{
+  const handler = require(join(ROOT, 'api', 'page.js'));
+  const { RESERVED_SLUGS } = __internals;
+  const realFetch = globalThis.fetch;
+
+  /** Devuelve las URLs que el handler le pidió al motor, si pidió alguna. */
+  async function consultasAlMotor(slug) {
+    const urls = [];
+    globalThis.fetch = async (u) => { urls.push(String(u)); return { status: 404, ok: false }; };
+    const res = { headers: {}, code: null, body: '', setHeader(k, v) { this.headers[k] = v; }, status(c) { this.code = c; return this; }, send(b) { this.body = b; return this; } };
+    await handler({ query: { slug } }, res);
+    globalThis.fetch = realFetch;
+    return { urls, res };
+  }
+
+  for (const slug of ['privacidad', 'terminos', 'index', 'videos', 'api']) {
+    const { urls, res } = await consultasAlMotor(slug);
+    check(urls.length === 0, `/${slug} → el motor NO recibe ninguna consulta (antes: sí, por "${slug}")`);
+    check(res.code === 404, `/${slug} → 404, no la página de un negocio con ese nombre`);
+  }
+
+  // Un slug real tiene que seguir llegando al motor: la lista no puede ser tan
+  // amplia como para taparle la página a un negocio.
+  const { urls } = await consultasAlMotor('cafe-luna');
+  check(urls.length === 1 && urls[0].endsWith('/api/public/page/cafe-luna'),
+    'un slug de negocio sigue llegando al motor igual que antes');
+
+  check(RESERVED_SLUGS.size === 5, 'la lista reservada es SOLO lo que este repo ocupa de verdad, no nombres por las dudas');
+
+  // Los que llevan punto ya se rechazaban por el regex, sin tocar el motor.
+  for (const slug of ['robots.txt', 'sitemap.xml', 'favicon.ico']) {
+    const { urls, res } = await consultasAlMotor(slug);
+    check(urls.length === 0 && res.code === 404, `/${slug} → 404 sin tocar el motor (lo rechaza el regex, ya era así)`);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+section('RUTEO · vercel.json resuelve las estáticas antes del catch-all');
+// ══════════════════════════════════════════════════════════════
+{
+  const vercel = JSON.parse(readFileSync(join(ROOT, 'vercel.json'), 'utf8'));
+  const rewrites = vercel.rewrites || [];
+  const iCatchAll = rewrites.findIndex((r) => r.source === '/:pageSlug');
+  check(iCatchAll !== -1, 'el catch-all de páginas de negocio sigue existiendo');
+
+  for (const pagina of ['privacidad', 'terminos']) {
+    const i = rewrites.findIndex((r) => r.source === `/${pagina}`);
+    check(i !== -1, `/${pagina} tiene su propio rewrite`);
+    check(i < iCatchAll, `y está ANTES del catch-all (si no, no sirve de nada)`);
+    check(rewrites[i] && rewrites[i].destination === `/${pagina}.html`, `que apunta al archivo estático, no al motor`);
+  }
+  check(iCatchAll === rewrites.length - 1, 'el catch-all queda último, que es el único lugar donde puede estar');
 }
 
 // ── Veredicto ────────────────────────────────────────────────

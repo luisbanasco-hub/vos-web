@@ -93,6 +93,26 @@ function safeHref(raw, allowed) {
 // un negocio es peor que no mostrar la fila.
 const INSTAGRAM_HANDLE = /^[A-Za-z0-9._]{1,30}$/;
 
+// ── Slugs que son de vos.chat, no de un negocio (H3) ─────────────────────────
+//
+// El rewrite `/:pageSlug` de vercel.json es un catch-all: cualquier URL de un
+// solo segmento cae en esta funcion. `/privacidad` y `/terminos` —la URL que
+// alguien tipea sin `.html`, o la que se carga en el App Review de Meta—
+// terminaban preguntandole al motor por un tenant llamado "privacidad" y
+// publicando "Aca no hay nada" en la pagina de politica de privacidad.
+//
+// La defensa de verdad son los rewrites explicitos ANTES del catch-all, que ya
+// estan en vercel.json. Esto es la segunda linea, y es la unica de las dos que
+// se puede verificar sin desplegar: pase lo que pase con el ruteo, el motor
+// nunca recibe una consulta por un path que es de este repo.
+//
+// La lista es solo lo que este repo OCUPA de verdad, donde el conflicto existe:
+// un archivo estatico y la pagina de un negocio no pueden vivir en la misma
+// URL. No se reservan nombres "por las dudas" (`robots`, `admin`, `shop`…):
+// eso le sacaria slugs legitimos a los negocios y, sobre todo, la lista
+// autoritativa de reservados es una decision de vos-app, no de acá.
+const RESERVED_SLUGS = new Set(['api', 'index', 'privacidad', 'terminos', 'videos']);
+
 const FAVICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%2326201c'/%3E%3Cpath d='M20 8c7.2 0 13 4.5 13 10.1 0 5.6-5.8 10-13 10-1.6 0-3.2-.2-4.6-.6L8 31l1.7-5.2C7.7 24.1 6 21.4 6 18.1 6 12.5 12.8 8 20 8Z' fill='%23c8993c'/%3E%3Ccircle cx='14.4' cy='18.3' r='2.1' fill='%2326201c'/%3E%3Ccircle cx='20' cy='18.3' r='2.1' fill='%2326201c'/%3E%3Ccircle cx='25.6' cy='18.3' r='2.1' fill='%2326201c'/%3E%3C/svg%3E";
 
 // Misma identidad que index.html: fondo cálido oscuro, dorado, Fraunces para
@@ -448,8 +468,8 @@ module.exports = async (req, res) => {
   // son la misma superficie HTML y el mismo origen.
   setSecurityHeaders(res);
 
-  // Slug inválido ≡ inexistente, misma página, sin tocar el motor.
-  if (!/^[a-z0-9-]{3,60}$/.test(raw)) {
+  // Slug inválido o reservado ≡ inexistente: misma página, sin tocar el motor.
+  if (!/^[a-z0-9-]{3,60}$/.test(raw) || RESERVED_SLUGS.has(raw)) {
     res.setHeader('Cache-Control', 'public, s-maxage=300');
     return res.status(404).send(renderNotFound());
   }
@@ -529,5 +549,5 @@ module.exports = async (req, res) => {
 // rastrear. No las use nadie más.
 module.exports.__internals = {
   safeHref, renderBusiness, setSecurityHeaders, sendBusiness, buildBusinessPage, buildJsonLd, buildCsp, jsonLdHash,
-  SCHEMES_WEBSITE, SCHEMES_MACHINE, SCHEMES_TEL, CSP, EngineShapeError, cache,
+  SCHEMES_WEBSITE, SCHEMES_MACHINE, SCHEMES_TEL, CSP, EngineShapeError, cache, RESERVED_SLUGS,
 };

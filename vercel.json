@@ -1,5 +1,7 @@
 {
   "rewrites": [
+    { "source": "/privacidad", "destination": "/privacidad.html" },
+    { "source": "/terminos", "destination": "/terminos.html" },
     { "source": "/:pageSlug", "destination": "/api/page?slug=:pageSlug" }
   ]
 }
