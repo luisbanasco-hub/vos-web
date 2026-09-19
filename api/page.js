@@ -165,9 +165,17 @@ function buildJsonLd(page, url) {
   };
   if (page.contact?.phone) ld.telephone = page.contact.phone;
   if (page.contact?.address) ld.address = { '@type': 'PostalAddress', streetAddress: page.contact.address };
+  // Por la MISMA allowlist y con los MISMOS Sets que el HTML (M-03). Antes
+  // estos dos salian crudos: es inerte como XSS —el JSON-LD es un data block y
+  // el `<` va escapado— pero un `javascript:` o un `misitio.com.ar` relativo,
+  // que el HTML descarta y no enlaza, llegaban igual al structured data que lee
+  // Google, como URLs invalidas en `sameAs`. Se emite la serializacion canonica
+  // del parser, que es exactamente la misma cadena que termina en el href.
   const sameAs = [];
-  if (page.contact?.website) sameAs.push(page.contact.website);
-  if (page.contact?.maps_uri) sameAs.push(page.contact.maps_uri);
+  const websiteLd = safeHref(page.contact?.website, SCHEMES_WEBSITE);
+  const mapsLd = safeHref(page.contact?.maps_uri, SCHEMES_MACHINE);
+  if (websiteLd) sameAs.push(websiteLd);
+  if (mapsLd) sameAs.push(mapsLd);
   if (sameAs.length) ld.sameAs = sameAs;
   if (Array.isArray(page.catalog) && page.catalog.length) {
     ld.makesOffer = page.catalog.slice(0, 20).map((p) => ({ '@type': 'Offer', itemOffered: { '@type': 'Product', name: p.name } }));

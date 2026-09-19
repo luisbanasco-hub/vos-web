@@ -218,6 +218,49 @@ section('CSP · el hash del JSON-LD corresponde al bloque emitido');
 }
 
 // ══════════════════════════════════════════════════════════════
+section('JSON-LD · pasa por la MISMA allowlist que el HTML (H5)');
+// ══════════════════════════════════════════════════════════════
+// `sameAs` emitia `website` y `maps_uri` CRUDOS, esquivando M-03. Inerte como
+// XSS, pero le entregaba a Google URLs que el propio HTML descarta por
+// invalidas. La regla que se verifica es: nada en `sameAs` que no aparezca
+// tambien como href de la pagina.
+{
+  const hostiles = {
+    address: 'Av. Siempreviva 742',
+    website: 'misitio.com.ar',                 // relativo: apuntaria a vos.chat
+    maps_uri: 'javascript:alert(document.domain)',
+  };
+  const page = basePage({ contact: hostiles });
+  const ld = JSON.parse(buildJsonLd(page, URL_BASE).replace(/\\u003c/g, '<'));
+  check(ld.sameAs === undefined, 'website relativo + maps_uri javascript: → no queda NINGÚN sameAs');
+
+  const html = renderBusiness(page, URL_BASE);
+  check(!/javascript:/i.test(JSON.stringify(ld)), 'ningún javascript: en el bloque de datos estructurados');
+  check(!hrefsOf(html).some((h) => /javascript:/i.test(h)), 'y tampoco en el HTML, como ya era');
+
+  // La regla, escrita como test: sameAs ⊆ href de la página.
+  // Con direccion: el link "Como llegar" solo se renderiza si hay `address`,
+  // asi que sin ella el maps_uri valido estaria en sameAs y no en ningun href
+  // — asimetria real de la pagina, no del filtro.
+  const ok = basePage({
+    contact: { address: 'Av. Siempreviva 742', website: 'HTTPS://MiSitio.com.AR/Ruta', maps_uri: 'https://maps.google.com/?cid=123' },
+  });
+  const ldOk = JSON.parse(buildJsonLd(ok, URL_BASE).replace(/\\u003c/g, '<'));
+  const hrefsOk = hrefsOf(renderBusiness(ok, URL_BASE));
+  check(ldOk.sameAs.length === 2, 'las URLs legítimas sí siguen en sameAs');
+  check(ldOk.sameAs.every((u) => hrefsOk.includes(u)),
+    'y TODO sameAs aparece también como href: misma cadena, misma serialización canónica');
+  check(ldOk.sameAs.includes('https://misitio.com.ar/Ruta'),
+    'se emite lo que leyó el parser, no lo que tipeó el dueño (mayúsculas normalizadas)');
+
+  // http: es válido donde lo tipea una persona, y sólo ahí.
+  const mixto = basePage({ contact: { website: 'http://viejositio.com.ar', maps_uri: 'http://maps.google.com/?cid=1' } });
+  const ldMixto = JSON.parse(buildJsonLd(mixto, URL_BASE).replace(/\\u003c/g, '<'));
+  check(ldMixto.sameAs.length === 1 && ldMixto.sameAs[0] === 'http://viejositio.com.ar/',
+    'sameAs respeta los Sets distintos: http para el sitio del dueño, no para el link que arma una máquina');
+}
+
+// ══════════════════════════════════════════════════════════════
 section('HANDLER · manejo de errores (H1)');
 // ══════════════════════════════════════════════════════════════
 // El handler exportado no se probaba: ni la caché, ni el 404/503, ni la forma
