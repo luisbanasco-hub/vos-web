@@ -124,6 +124,9 @@
   .field::placeholder{color:rgba(216,185,138,.55)}
   .field:focus{border-color:var(--gold);background:rgba(246,240,230,.08)}
   .form .btn{width:100%}
+  /* Honeypot: fuera de la vista de todos, sin ocupar lugar y sin animarse.
+     No se usa [hidden] ni display:none porque hay bots que saltean justo eso. */
+  .hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
   .phonehint{font-size:12.5px;color:var(--camel);opacity:.7;text-align:left;margin:-2px 2px 0}
   .done{display:flex;flex-direction:column;align-items:center;gap:8px;padding:26px 22px;border-radius:16px;background:rgba(200,153,60,.1);border:1px solid rgba(200,153,60,.28);animation:rise .5s ease both}
   @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
@@ -409,6 +412,15 @@
       <form class="form" id="waitlist" novalidate>
         <input class="field" id="email" type="email" placeholder="Tu email" autocomplete="email" required>
         <input class="field" id="phone" type="tel" placeholder="Tu WhatsApp (opcional)" autocomplete="tel">
+        <!-- Honeypot. Invisible, fuera del orden de tabulacion y fuera del arbol
+             de accesibilidad: ninguna persona lo ve ni lo puede completar. Si
+             llega con algo, lo lleno un bot y el alta se descarta en el servidor.
+             El nombre NO es "empresa" ni "company" a proposito: esos disparan el
+             autocompletado del browser y llenarian el campo de un usuario real. -->
+        <div class="hp" aria-hidden="true">
+          <label for="vos-hp">No completar</label>
+          <input id="vos-hp" name="vos-hp" type="text" tabindex="-1" autocomplete="off">
+        </div>
         <div class="phonehint">Dejanos tu número si preferís que te llamemos en vez de escribirte.</div>
         <button class="btn btn-primary" id="submit" type="submit">Avisame</button>
       </form>
@@ -447,31 +459,56 @@
 </div>
 
 <script>
-  // ── vos-multitenant Supabase waitlist ──────────────────────────────
-  // The anon key is public by design; it is used ONLY for the single
-  // vos_join_waitlist RPC call below.
-  var SUPABASE_URL = 'https://nqjtrwijfoyuqrkeelve.supabase.co'; // ← PROJECT_URL
-  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5xanRyd2lqZm95dXFya2VlbHZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzNTQ5NjYsImV4cCI6MjA5ODkzMDk2Nn0.Rx7JOibEeQnao0xV5jeLJFATid18dVam-3guqvH8Og8';               // ← ANON_KEY
+  // ── Lista de espera ────────────────────────────────────────────────
+  // Se postea a /api/waitlist, del MISMO ORIGEN. Antes se le pegaba directo al
+  // RPC de Supabase desde acá, con la anon key a la vista y sin ninguna
+  // defensa: ahora el honeypot, el límite por IP y la validación del teléfono
+  // los aplica el servidor, que es el único lugar donde sirven.
   // ────────────────────────────────────────────────────────────────────
 
   (function () {
     var form = document.getElementById('waitlist');
     var input = document.getElementById('email');
     var phoneInput = document.getElementById('phone');
+    var hpInput = document.getElementById('vos-hp');
     var btn = document.getElementById('submit');
     var errEl = document.getElementById('err');
     var doneEl = document.getElementById('done');
     var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    var busy = false;
+    // Mismo criterio que el servidor: 8 a 15 dígitos, `+` opcional. Acá es para
+    // avisarle a la persona antes de mandar; la validación que cuenta es la de
+    // /api/waitlist, porque ésta se saltea sin pasar por el formulario.
+    var PHONE_RE = /^\+?\d{8,15}$/;
+    var MSG = {
+      limite: 'Probaste varias veces seguidas. Esperá unos minutos y volvé a intentar.',
+      email: 'Ese email no parece válido. Revisalo y probá de nuevo.',
+      telefono: 'Ese número no parece válido. Revisalo, o dejalo vacío.',
+      generico: 'Uy, algo falló. Probá de nuevo.'
+    };
 
+    function fallar(clave) {
+      errEl.textContent = MSG[clave] || MSG.generico;
+      errEl.hidden = false;
+    }
+    function habilitar() {
+      busy = false;
+      btn.disabled = false;
+      input.disabled = false;
+      phoneInput.disabled = false;
+      btn.textContent = 'Avisame';
+    }
+
+    var busy = false;
     input.addEventListener('input', function () { errEl.hidden = true; });
+    phoneInput.addEventListener('input', function () { errEl.hidden = true; });
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       if (busy) return;
       var email = (input.value || '').trim();
       var phone = (phoneInput.value || '').trim();
-      if (!EMAIL_RE.test(email)) { errEl.hidden = false; return; }
+      if (!EMAIL_RE.test(email)) { fallar('email'); return; }
+      if (phone && !PHONE_RE.test(phone.replace(/[\s\-.()]/g, ''))) { fallar('telefono'); return; }
 
       busy = true;
       errEl.hidden = true;
@@ -480,26 +517,28 @@
       phoneInput.disabled = true;
       btn.textContent = 'Enviando…';
 
-      fetch(SUPABASE_URL + '/rest/v1/rpc/vos_join_waitlist', {
+      fetch('/api/waitlist', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_ANON_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
-        },
-        body: JSON.stringify({ p_email: email, p_source: 'website', p_phone: phone || null })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          phone: phone || null,
+          vos_hp: hpInput ? hpInput.value : ''
+        })
       }).then(function (res) {
-        if (!res.ok) throw new Error('rpc ' + res.status);
-        form.hidden = true;
-        errEl.hidden = true;
-        doneEl.hidden = false;
+        if (res.ok) {
+          form.hidden = true;
+          errEl.hidden = true;
+          doneEl.hidden = false;
+          return;
+        }
+        return res.json().catch(function () { return {}; }).then(function (data) {
+          fallar(data && data.error);
+          habilitar();
+        });
       }).catch(function () {
-        errEl.hidden = false;
-        busy = false;
-        btn.disabled = false;
-        input.disabled = false;
-        phoneInput.disabled = false;
-        btn.textContent = 'Avisame';
+        fallar('generico');
+        habilitar();
       });
     });
   })();
