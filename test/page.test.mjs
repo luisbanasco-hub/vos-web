@@ -15,7 +15,7 @@
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
 
 const require = createRequire(import.meta.url);
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -596,6 +596,39 @@ section('CACHÉ · con tope y con vencimiento (H6)');
     console.error = realErr; Date.now = realNow; globalThis.fetch = realFetch;
     check(res.code === 200, 'con el motor caído después del barrido, el negocio real se sigue sirviendo desde el rescate');
   }
+}
+
+// ══════════════════════════════════════════════════════════════
+section('REPO · ningún binario grande nuevo (H7)');
+// ══════════════════════════════════════════════════════════════
+// El video de 5,37 MB se deja donde está: no hay Git LFS, ni Vercel Blob, ni
+// CDN configurado, y Vercel despliega desde git — sacarlo del repo lo saca del
+// sitio. Con una sola versión de cada archivo, hoy no molesta.
+//
+// Lo que sí molesta es el PRÓXIMO: cada recorte nuevo suma otros ~5 MB al
+// historial, para siempre, aunque después se borre el archivo. Este check está
+// para que esa decisión se tome a propósito y no por inercia.
+{
+  const UN_MB = 1024 * 1024;
+  const PERMITIDOS = ['videos/vos-explainer.mp4'];
+
+  const grandes = [];
+  (function recorrer(dir, rel) {
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      if (e.name === '.git' || e.name === 'node_modules') continue;
+      const ruta = rel ? `${rel}/${e.name}` : e.name;
+      if (e.isDirectory()) recorrer(join(dir, e.name), ruta);
+      else if (statSync(join(dir, e.name)).size > UN_MB) grandes.push(ruta);
+    }
+  })(ROOT, '');
+
+  const inesperados = grandes.filter((f) => !PERMITIDOS.includes(f));
+  check(inesperados.length === 0,
+    inesperados.length === 0
+      ? `los únicos binarios >1 MB son los previstos (${grandes.join(', ') || 'ninguno'})`
+      : `ARCHIVO GRANDE NUEVO: ${inesperados.join(', ')} — ver "El video sigue en git" en el README antes de commitearlo`);
+  check(grandes.length === PERMITIDOS.length && PERMITIDOS.every((f) => grandes.includes(f)),
+    'y el video previsto sigue donde tiene que estar (si se movió a un CDN, actualizar esta lista y el README)');
 }
 
 // ── Veredicto ────────────────────────────────────────────────
