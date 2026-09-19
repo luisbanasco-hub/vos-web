@@ -28,7 +28,43 @@ const TTL_MISS_MS = 60 * 1000;          // 404: reintentar pronto (quizá public
 const STALE_RESCUE_MS = 24 * 60 * 60 * 1000; // hasta dónde sirve una copia vieja si el motor cayó
 const FETCH_TIMEOUT_MS = 5000;
 
-const cache = new Map(); // slug -> { at, status, page, publishedAt }
+// ── Cache en memoria, ACOTADA (H6) ───────────────────────────────────────────
+//
+// DOS Maps y no uno, a proposito. Con un solo Map compartido, un barrido de
+// slugs inexistentes —que es gratis de hacer, las URLs son publicas— desalojaria
+// las copias de rescate de los negocios REALES para hacerle lugar a basura. Con
+// dos, ese barrido solo llena `missCache`, que descarta sus propias entradas, y
+// no puede tocar una sola copia de rescate. La caja que hay que proteger es esa.
+//
+// Antes no habia ni tope ni descarte: `cache.set` sin `delete`, `clear` ni
+// control de tamano, asi que cada slug distinto dejaba una entrada para siempre
+// en cada instancia caliente.
+const OK_MAX = 500;    // negocios con copia de rescate viva
+const MISS_MAX = 1000; // slugs que el motor dijo que no existen
+
+const okCache = new Map();   // slug -> { at, page, publishedAt }
+const missCache = new Map(); // slug -> { at }
+
+/** Entrada viva, o `null`. Una vencida se descarta al leerla: ese es el vencimiento. */
+function cacheGet(map, slug, maxAgeMs, now) {
+  const hit = map.get(slug);
+  if (!hit) return null;
+  if (now - hit.at >= maxAgeMs) { map.delete(slug); return null; }
+  return hit;
+}
+
+/**
+ * Guarda y mantiene el tope. Primero se van las vencidas, que son puro lastre;
+ * si aun sobra, la mas vieja por insercion. El `delete` previo reinserta al
+ * final, asi una entrada que se refresca no queda cerca del corte.
+ */
+function cacheSet(map, slug, entry, max, maxAgeMs, now) {
+  map.delete(slug);
+  map.set(slug, entry);
+  if (map.size <= max) return;
+  for (const [k, v] of map) if (now - v.at >= maxAgeMs) map.delete(k);
+  while (map.size > max) map.delete(map.keys().next().value);
+}
 
 function esc(s) {
   return String(s ?? '')
@@ -476,24 +512,29 @@ module.exports = async (req, res) => {
 
   const url = `https://vos.chat/${raw}`;
   const now = Date.now();
-  const cached = cache.get(raw);
+  // Copia de rescate: la que todavia sirve para salvar a este negocio si el
+  // motor se cae (hasta 24 h). Si esta FRESCA se usa directo; si no, se guarda
+  // para el `catch`. Mas vieja que eso ya no sirve y `cacheGet` la descarta.
+  const rescate = cacheGet(okCache, raw, STALE_RESCUE_MS, now);
 
   // Frescura en memoria (instancia caliente): ni motor ni CDN.
-  if (cached && now - cached.at < (cached.status === 200 ? TTL_OK_MS : TTL_MISS_MS)) {
-    if (cached.status !== 200) {
-      res.setHeader('Cache-Control', 'public, s-maxage=60');
-      return res.status(404).send(renderNotFound());
-    }
+  if (rescate && now - rescate.at < TTL_OK_MS) {
     try {
-      return sendBusiness(res, cached.page, url, 'public, s-maxage=300, stale-while-revalidate=600');
+      return sendBusiness(res, rescate.page, url, 'public, s-maxage=300, stale-while-revalidate=600');
     } catch (err) {
       // Estructuralmente no debería pasar: al Map sólo entran páginas que YA se
       // renderizaron bien una vez (más abajo). Si igual ocurre, la entrada se
       // descarta para que la próxima visita vuelva a preguntarle al motor en vez
       // de repetir el mismo 500 durante los 5 minutos del TTL.
-      cache.delete(raw);
+      okCache.delete(raw);
       return sendRenderFailure(res, raw, err, 'render_cached');
     }
+  }
+
+  // 404 fresco: el motor ya dijo que no existe hace menos de un minuto.
+  if (cacheGet(missCache, raw, TTL_MISS_MS, now)) {
+    res.setHeader('Cache-Control', 'public, s-maxage=60');
+    return res.status(404).send(renderNotFound());
   }
 
   let fetched;
@@ -504,12 +545,12 @@ module.exports = async (req, res) => {
     // toca el Map: la copia vieja es exactamente lo que salva a este negocio, y
     // pisarla con el resultado de un fallo es perder la red justo cuando se cae.
     const step = err instanceof EngineShapeError ? 'engine_shape' : 'engine_fetch';
-    if (cached && cached.status === 200 && now - cached.at < STALE_RESCUE_MS) {
+    if (rescate) {
       // Copia vieja (hasta 24 h) antes que un error: los datos de un negocio
       // cambian poco y el link lo abre un cliente final.
-      logFailure({ step, slug: raw, served: 'stale', stale_age_s: Math.round((now - cached.at) / 1000), ...describeError(err) });
+      logFailure({ step, slug: raw, served: 'stale', stale_age_s: Math.round((now - rescate.at) / 1000), ...describeError(err) });
       try {
-        return sendBusiness(res, cached.page, url, 'public, s-maxage=60');
+        return sendBusiness(res, rescate.page, url, 'public, s-maxage=60');
       } catch (renderErr) {
         return sendRenderFailure(res, raw, renderErr, 'render_stale');
       }
@@ -524,7 +565,8 @@ module.exports = async (req, res) => {
     // de rescate, y debe pisarse — si el dueño despublicó, seguir sirviendo la
     // copia vieja cuando el motor se caiga sería volver a publicar lo que pidió
     // bajar. Caché corta: si publica recién, lo ve en ~1 min.
-    cache.set(raw, { at: now, status: 404 });
+    okCache.delete(raw);
+    cacheSet(missCache, raw, { at: now }, MISS_MAX, TTL_MISS_MS, now);
     res.setHeader('Cache-Control', 'public, s-maxage=60');
     return res.status(404).send(renderNotFound());
   }
@@ -539,7 +581,8 @@ module.exports = async (req, res) => {
   } catch (err) {
     return sendRenderFailure(res, raw, err, 'render');
   }
-  cache.set(raw, { at: now, status: 200, page: fetched.page, publishedAt: fetched.publishedAt });
+  missCache.delete(raw);
+  cacheSet(okCache, raw, { at: now, page: fetched.page, publishedAt: fetched.publishedAt }, OK_MAX, STALE_RESCUE_MS, now);
   return sendBuilt(res, built, 'public, s-maxage=300, stale-while-revalidate=600');
 };
 
@@ -549,5 +592,6 @@ module.exports = async (req, res) => {
 // rastrear. No las use nadie más.
 module.exports.__internals = {
   safeHref, renderBusiness, setSecurityHeaders, sendBusiness, buildBusinessPage, buildJsonLd, buildCsp, jsonLdHash,
-  SCHEMES_WEBSITE, SCHEMES_MACHINE, SCHEMES_TEL, CSP, EngineShapeError, cache, RESERVED_SLUGS,
+  SCHEMES_WEBSITE, SCHEMES_MACHINE, SCHEMES_TEL, CSP, EngineShapeError, RESERVED_SLUGS,
+  okCache, missCache, cacheGet, cacheSet, OK_MAX, MISS_MAX,
 };

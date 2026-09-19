@@ -36,6 +36,7 @@ function section(label) {
 }
 
 const URL_BASE = 'https://vos.chat/mi-negocio';
+const TTL_MISS = 60 * 1000; // TTL_MISS_MS de api/page.js
 const basePage = (over = {}) => ({
   name: 'Café Luna',
   category: 'Cafetería',
@@ -271,7 +272,7 @@ section('HANDLER · manejo de errores (H1)');
 // corriendo con node pelado y sin levantar nada.
 {
   const handler = require(join(ROOT, 'api', 'page.js'));
-  const cache = __internals.cache;
+  const { okCache, missCache } = __internals;
 
   const realFetch = globalThis.fetch;
   const realNow = Date.now;
@@ -319,8 +320,8 @@ section('HANDLER · manejo de errores (H1)');
     r = await call('negocio-a', motorBody({}), T0 + 6 * MIN);
     check(r.res.code !== 404, 'body inesperado → NO se responde 404 (antes: "Acá no hay nada" sobre un negocio que existe)');
     check(r.res.code === 200, 'se sirve la copia de rescate en su lugar');
-    check(cache.get('negocio-a') && cache.get('negocio-a').status === 200 && cache.get('negocio-a').at === T0,
-      'y la entrada 200 del Map queda INTACTA — el fallo no la pisa');
+    check(okCache.get('negocio-a') && okCache.get('negocio-a').at === T0,
+      'y la copia de rescate queda INTACTA — el fallo no la pisa');
     check(r.log && r.log.step === 'engine_shape', 'queda logueado, y distingue "cambió el contrato" de "se cayó"');
     check(r.log && r.log.served === 'stale', 'el log dice qué se terminó sirviendo');
 
@@ -336,7 +337,8 @@ section('HANDLER · manejo de errores (H1)');
 
     r = await call('negocio-b', motor404, T0 + 6 * MIN);
     check(r.res.code === 404, 'un 404 real del motor sí responde 404');
-    check(cache.get('negocio-b').status === 404, 'y sí reemplaza la copia de rescate (asimetría deliberada con el caso de arriba)');
+    check(!okCache.has('negocio-b') && missCache.has('negocio-b'),
+      'y sí borra la copia de rescate (asimetría deliberada con el caso de arriba)');
 
     r = await call('negocio-b', motorCaido, T0 + 8 * MIN);
     check(r.res.code === 503, 'con el motor caído, una página despublicada NO reaparece desde la caché');
@@ -352,7 +354,7 @@ section('HANDLER · manejo de errores (H1)');
     check(r.res.headers['Cache-Control'] === 'no-store', 'y no se cachea');
     check(/script-src 'none'/.test(r.res.headers['Content-Security-Policy']), 'con la CSP estricta, sin el hash de un JSON-LD que no se emitió');
     check(r.log && r.log.step === 'render', 'logueado como fallo de render');
-    check(!cache.has('negocio-c'), 'la página que no se puede dibujar NO entra al Map');
+    check(!okCache.has('negocio-c'), 'la página que no se puede dibujar NO entra al Map');
 
     r = await call('negocio-c', motorOk(ROTA), T0 + 1000);
     check(r.threw === null && r.res.code === 500,
@@ -522,6 +524,78 @@ section('ESTÁTICAS · headers de seguridad (H4, la otra mitad de B-03)');
     "connect-src 'self': alcanza porque el formulario postea a /api/waitlist (H2). Si volviera a pegarle directo a Supabase, la CSP lo bloquearía");
   check(/script-src[^;]*'self'/.test(CSP_EST),
     "script-src incluye 'self': hoy no hay scripts externos, pero si el proyecto tiene Vercel Analytics, Vercel inyecta uno del mismo origen");
+}
+
+// ══════════════════════════════════════════════════════════════
+section('CACHÉ · con tope y con vencimiento (H6)');
+// ══════════════════════════════════════════════════════════════
+// El Map no tenía ni tope ni descarte: `cache.set` sin `delete`, `clear` ni
+// control de tamaño. Cada slug distinto dejaba una entrada para siempre en cada
+// instancia caliente, y barrer slugs inexistentes es gratis — las URLs son
+// públicas.
+{
+  const { okCache, missCache, cacheGet, cacheSet, OK_MAX, MISS_MAX } = __internals;
+  const T = 2000000000000;
+
+  // ── Tope ───────────────────────────────────────────────────────────────────
+  {
+    const m = new Map();
+    for (let i = 0; i < MISS_MAX + 700; i++) cacheSet(m, `barrido-${i}`, { at: T }, MISS_MAX, TTL_MISS, T);
+    check(m.size <= MISS_MAX, `${MISS_MAX + 700} slugs distintos → el Map quedó en ${m.size} (tope ${MISS_MAX})`);
+    check(m.has(`barrido-${MISS_MAX + 699}`), 'la última entrada sigue ahí: se descartan las viejas, no las nuevas');
+    check(!m.has('barrido-0'), 'y la más vieja por inserción se fue');
+  }
+
+  // ── Vencimiento ────────────────────────────────────────────────────────────
+  {
+    const m = new Map();
+    cacheSet(m, 'vieja', { at: T }, 10, 1000, T);
+    check(cacheGet(m, 'vieja', 1000, T + 500) !== null, 'dentro de su ventana, la entrada se usa');
+    check(cacheGet(m, 'vieja', 1000, T + 1000) === null, 'pasada la ventana NO se usa');
+    check(m.has('vieja') === false, 'y además se borra al leerla: el vencimiento libera memoria, no sólo ignora');
+  }
+
+  // ── Lo que de verdad hay que proteger ──────────────────────────────────────
+  // Un barrido de slugs inexistentes no puede desalojar la copia de rescate de
+  // un negocio real. Por eso son DOS Maps y no uno con presupuesto compartido.
+  {
+    const handler = require(join(ROOT, 'api', 'page.js'));
+    const realFetch = globalThis.fetch;
+    const realNow = Date.now;
+    const realErr = console.error;
+    const PAGINA = { name: 'Café Luna', wa_link: 'https://wa.me/5491155554444', catalog: [{ name: 'Flat white' }] };
+
+    async function visita(slug, existe, at) {
+      globalThis.fetch = existe
+        ? async () => ({ status: 200, ok: true, json: async () => ({ ok: true, page: PAGINA }) })
+        : async () => ({ status: 404, ok: false });
+      Date.now = () => at;
+      console.error = () => {};
+      const res = { headers: {}, code: null, setHeader(k, v) { this.headers[k] = v; }, status(c) { this.code = c; return this; }, send() { return this; } };
+      await handler({ query: { slug } }, res);
+      console.error = realErr; Date.now = realNow; globalThis.fetch = realFetch;
+      return res;
+    }
+
+    await visita('negocio-que-paga', true, T);
+    check(okCache.has('negocio-que-paga'), 'setup · el negocio tiene su copia de rescate');
+
+    const misesAntes = missCache.size;
+    for (let i = 0; i < MISS_MAX + 200; i++) await visita(`inventado-${i}`, false, T);
+    check(missCache.size <= MISS_MAX, `tras ${MISS_MAX + 200} slugs inventados, missCache quedó en ${missCache.size}`);
+    check(okCache.has('negocio-que-paga'),
+      'y la copia de rescate del negocio REAL sigue intacta: el barrido no le puede sacar el lugar');
+    check(misesAntes >= 0 && okCache.size <= OK_MAX, `okCache dentro de su propio tope (${okCache.size} ≤ ${OK_MAX})`);
+
+    // Y sigue sirviendo para lo que existe: motor caído después del barrido.
+    globalThis.fetch = async () => { throw new Error('down'); };
+    Date.now = () => T + 6 * 60 * 1000;
+    console.error = () => {};
+    const res = { headers: {}, code: null, setHeader(k, v) { this.headers[k] = v; }, status(c) { this.code = c; return this; }, send() { return this; } };
+    await handler({ query: { slug: 'negocio-que-paga' } }, res);
+    console.error = realErr; Date.now = realNow; globalThis.fetch = realFetch;
+    check(res.code === 200, 'con el motor caído después del barrido, el negocio real se sigue sirviendo desde el rescate');
+  }
 }
 
 // ── Veredicto ────────────────────────────────────────────────
