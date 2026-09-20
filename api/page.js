@@ -28,7 +28,43 @@ const TTL_MISS_MS = 60 * 1000;          // 404: reintentar pronto (quizá public
 const STALE_RESCUE_MS = 24 * 60 * 60 * 1000; // hasta dónde sirve una copia vieja si el motor cayó
 const FETCH_TIMEOUT_MS = 5000;
 
-const cache = new Map(); // slug -> { at, status, page, publishedAt }
+// ── Cache en memoria, ACOTADA (H6) ───────────────────────────────────────────
+//
+// DOS Maps y no uno, a proposito. Con un solo Map compartido, un barrido de
+// slugs inexistentes —que es gratis de hacer, las URLs son publicas— desalojaria
+// las copias de rescate de los negocios REALES para hacerle lugar a basura. Con
+// dos, ese barrido solo llena `missCache`, que descarta sus propias entradas, y
+// no puede tocar una sola copia de rescate. La caja que hay que proteger es esa.
+//
+// Antes no habia ni tope ni descarte: `cache.set` sin `delete`, `clear` ni
+// control de tamano, asi que cada slug distinto dejaba una entrada para siempre
+// en cada instancia caliente.
+const OK_MAX = 500;    // negocios con copia de rescate viva
+const MISS_MAX = 1000; // slugs que el motor dijo que no existen
+
+const okCache = new Map();   // slug -> { at, page, publishedAt }
+const missCache = new Map(); // slug -> { at }
+
+/** Entrada viva, o `null`. Una vencida se descarta al leerla: ese es el vencimiento. */
+function cacheGet(map, slug, maxAgeMs, now) {
+  const hit = map.get(slug);
+  if (!hit) return null;
+  if (now - hit.at >= maxAgeMs) { map.delete(slug); return null; }
+  return hit;
+}
+
+/**
+ * Guarda y mantiene el tope. Primero se van las vencidas, que son puro lastre;
+ * si aun sobra, la mas vieja por insercion. El `delete` previo reinserta al
+ * final, asi una entrada que se refresca no queda cerca del corte.
+ */
+function cacheSet(map, slug, entry, max, maxAgeMs, now) {
+  map.delete(slug);
+  map.set(slug, entry);
+  if (map.size <= max) return;
+  for (const [k, v] of map) if (now - v.at >= maxAgeMs) map.delete(k);
+  while (map.size > max) map.delete(map.keys().next().value);
+}
 
 function esc(s) {
   return String(s ?? '')
@@ -92,6 +128,26 @@ function safeHref(raw, allowed) {
 // no es un handle sólo produce un link muerto, y un link muerto en la página de
 // un negocio es peor que no mostrar la fila.
 const INSTAGRAM_HANDLE = /^[A-Za-z0-9._]{1,30}$/;
+
+// ── Slugs que son de vos.chat, no de un negocio (H3) ─────────────────────────
+//
+// El rewrite `/:pageSlug` de vercel.json es un catch-all: cualquier URL de un
+// solo segmento cae en esta funcion. `/privacidad` y `/terminos` —la URL que
+// alguien tipea sin `.html`, o la que se carga en el App Review de Meta—
+// terminaban preguntandole al motor por un tenant llamado "privacidad" y
+// publicando "Aca no hay nada" en la pagina de politica de privacidad.
+//
+// La defensa de verdad son los rewrites explicitos ANTES del catch-all, que ya
+// estan en vercel.json. Esto es la segunda linea, y es la unica de las dos que
+// se puede verificar sin desplegar: pase lo que pase con el ruteo, el motor
+// nunca recibe una consulta por un path que es de este repo.
+//
+// La lista es solo lo que este repo OCUPA de verdad, donde el conflicto existe:
+// un archivo estatico y la pagina de un negocio no pueden vivir en la misma
+// URL. No se reservan nombres "por las dudas" (`robots`, `admin`, `shop`…):
+// eso le sacaria slugs legitimos a los negocios y, sobre todo, la lista
+// autoritativa de reservados es una decision de vos-app, no de acá.
+const RESERVED_SLUGS = new Set(['api', 'index', 'privacidad', 'terminos', 'videos']);
 
 const FAVICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%2326201c'/%3E%3Cpath d='M20 8c7.2 0 13 4.5 13 10.1 0 5.6-5.8 10-13 10-1.6 0-3.2-.2-4.6-.6L8 31l1.7-5.2C7.7 24.1 6 21.4 6 18.1 6 12.5 12.8 8 20 8Z' fill='%23c8993c'/%3E%3Ccircle cx='14.4' cy='18.3' r='2.1' fill='%2326201c'/%3E%3Ccircle cx='20' cy='18.3' r='2.1' fill='%2326201c'/%3E%3Ccircle cx='25.6' cy='18.3' r='2.1' fill='%2326201c'/%3E%3C/svg%3E";
 
@@ -165,9 +221,17 @@ function buildJsonLd(page, url) {
   };
   if (page.contact?.phone) ld.telephone = page.contact.phone;
   if (page.contact?.address) ld.address = { '@type': 'PostalAddress', streetAddress: page.contact.address };
+  // Por la MISMA allowlist y con los MISMOS Sets que el HTML (M-03). Antes
+  // estos dos salian crudos: es inerte como XSS —el JSON-LD es un data block y
+  // el `<` va escapado— pero un `javascript:` o un `misitio.com.ar` relativo,
+  // que el HTML descarta y no enlaza, llegaban igual al structured data que lee
+  // Google, como URLs invalidas en `sameAs`. Se emite la serializacion canonica
+  // del parser, que es exactamente la misma cadena que termina en el href.
   const sameAs = [];
-  if (page.contact?.website) sameAs.push(page.contact.website);
-  if (page.contact?.maps_uri) sameAs.push(page.contact.maps_uri);
+  const websiteLd = safeHref(page.contact?.website, SCHEMES_WEBSITE);
+  const mapsLd = safeHref(page.contact?.maps_uri, SCHEMES_MACHINE);
+  if (websiteLd) sameAs.push(websiteLd);
+  if (mapsLd) sameAs.push(mapsLd);
   if (sameAs.length) ld.sameAs = sameAs;
   if (Array.isArray(page.catalog) && page.catalog.length) {
     ld.makesOffer = page.catalog.slice(0, 20).map((p) => ({ '@type': 'Offer', itemOffered: { '@type': 'Product', name: p.name } }));
@@ -325,15 +389,95 @@ function setSecurityHeaders(res, jsonLd = null) {
 }
 
 /**
- * Única salida de una página de negocio. El bloque JSON-LD se construye UNA vez
- * y la misma cadena va al HTML y al hash de la CSP — si se construyera dos veces
- * bastaría un espacio de diferencia para que el hash no cierre.
+ * Arma la página de un negocio SIN tocar `res`. Todo lo que puede explotar
+ * —construir el JSON-LD, renderizar el HTML— ocurre acá, ANTES de escribir un
+ * solo header: si falla, la respuesta sigue limpia y el que llama decide qué
+ * mandar. Antes el render se evaluaba como argumento de `.send()`, después de
+ * `res.status(200)`, así que un dato raro dejaba la respuesta a medio armar.
+ *
+ * El bloque JSON-LD se construye UNA vez y la misma cadena va al HTML y al hash
+ * de la CSP — si se construyera dos veces bastaría un espacio de diferencia para
+ * que el hash no cierre.
  */
-function sendBusiness(res, page, url, cacheControl) {
+function buildBusinessPage(page, url) {
   const jsonLd = buildJsonLd(page, url);
-  setSecurityHeaders(res, jsonLd);
+  return { jsonLd, html: renderBusiness(page, url, jsonLd) };
+}
+
+/** Manda una página ya armada. No puede fallar por los datos del negocio. */
+function sendBuilt(res, built, cacheControl) {
+  setSecurityHeaders(res, built.jsonLd);
   res.setHeader('Cache-Control', cacheControl);
-  return res.status(200).send(renderBusiness(page, url, jsonLd));
+  return res.status(200).send(built.html);
+}
+
+/** Única salida de una página de negocio: armar y mandar. */
+function sendBusiness(res, page, url, cacheControl) {
+  return sendBuilt(res, buildBusinessPage(page, url), cacheControl);
+}
+
+// ── Errores propios y logging (H1) ───────────────────────────────────────────
+//
+// Antes TODO fallo —motor caído, motor con otro contrato, bug de render— caía en
+// el mismo `catch` vacío: cero líneas en los logs de Vercel y tres causas
+// distintas disfrazadas de la misma respuesta. Acá se separan, porque se
+// arreglan distinto: el motor caído se espera y pasa, un cambio de contrato hay
+// que ir a mirarlo, y un render roto es un bug nuestro.
+
+/**
+ * El motor contestó 200 pero el body no tiene la forma `{ ok, page }`.
+ *
+ * Se distingue de un 404 A PROPÓSITO. Un 404 es información sobre el negocio
+ * ("no existe" / "no está publicada"); un body que no entendemos no dice nada
+ * sobre el negocio, dice que dejamos de entendernos con el motor. Tratarlo como
+ * 404 —lo que se hacía— publicaba "acá no hay nada" sobre un negocio que existe
+ * y, peor, pisaba en la caché la última copia buena que teníamos de él.
+ */
+class EngineShapeError extends Error {
+  constructor() {
+    super('el motor contestó 200 con un body sin { ok, page }');
+    this.name = 'EngineShapeError';
+  }
+}
+
+/**
+ * Una línea JSON por fallo, a stderr, que es lo que indexan los logs de Vercel.
+ *
+ * NUNCA se loguea el body del motor ni el objeto `page`: ahí viven el teléfono,
+ * la dirección y el WhatsApp del negocio. El `slug` SÍ, porque es el segmento
+ * público de la URL (`^[a-z0-9-]{3,60}$`, ya validado cuando se llega acá) y sin
+ * él un error en el log no dice QUÉ negocio se cayó, que es exactamente lo que
+ * hace falta saber para arreglarlo.
+ */
+function logFailure(fields) {
+  try {
+    console.error(JSON.stringify({ evt: 'vos-web.page.fail', ...fields }));
+  } catch {
+    // Un fallo al loguear jamás puede tumbar la respuesta del visitante.
+  }
+}
+
+/** Nombre y mensaje del error, recortados. Sin stack y sin datos del tenant. */
+function describeError(err) {
+  if (!(err instanceof Error)) return { err: 'NonError', msg: String(err ?? '').slice(0, 200) };
+  return { err: err.name || 'Error', msg: String(err.message ?? '').slice(0, 200) };
+}
+
+/**
+ * Falla de RENDER: el motor contestó bien y nosotros no supimos dibujar esos
+ * datos. Es un bug nuestro, así que sale 500 —y no el 503 de "motor caído", que
+ * sería mentira y mandaría a mirar el lugar equivocado— y queda registrado.
+ *
+ * Lo importante es que NO escape como excepción: fuera del `try` del handler,
+ * una excepción es un 500 genérico de Vercel sin una sola línea que diga qué
+ * negocio ni por qué.
+ */
+function sendRenderFailure(res, slug, err, step) {
+  logFailure({ step, slug, served: '500', ...describeError(err) });
+  // CSP estricta acá, sin depender de por qué camino se llegó.
+  setSecurityHeaders(res);
+  res.setHeader('Cache-Control', 'no-store');
+  return res.status(500).send(renderUnavailable());
 }
 
 async function fetchPage(slug) {
@@ -344,7 +488,9 @@ async function fetchPage(slug) {
     if (r.status === 404) return { status: 404 };
     if (!r.ok) throw new Error(`engine ${r.status}`);
     const body = await r.json();
-    if (!body?.ok || !body.page) return { status: 404 };
+    // Un body inesperado NO es un 404: se trata como falla del motor, así entra
+    // en juego el rescate stale y la copia buena no se toca. Ver EngineShapeError.
+    if (!body?.ok || !body.page) throw new EngineShapeError();
     return { status: 200, page: body.page, publishedAt: body.published_at ?? null };
   } finally {
     clearTimeout(timer);
@@ -358,39 +504,86 @@ module.exports = async (req, res) => {
   // son la misma superficie HTML y el mismo origen.
   setSecurityHeaders(res);
 
-  // Slug inválido ≡ inexistente, misma página, sin tocar el motor.
-  if (!/^[a-z0-9-]{3,60}$/.test(raw)) {
+  // Slug inválido o reservado ≡ inexistente: misma página, sin tocar el motor.
+  if (!/^[a-z0-9-]{3,60}$/.test(raw) || RESERVED_SLUGS.has(raw)) {
     res.setHeader('Cache-Control', 'public, s-maxage=300');
     return res.status(404).send(renderNotFound());
   }
 
   const url = `https://vos.chat/${raw}`;
   const now = Date.now();
-  const cached = cache.get(raw);
+  // Copia de rescate: la que todavia sirve para salvar a este negocio si el
+  // motor se cae (hasta 24 h). Si esta FRESCA se usa directo; si no, se guarda
+  // para el `catch`. Mas vieja que eso ya no sirve y `cacheGet` la descarta.
+  const rescate = cacheGet(okCache, raw, STALE_RESCUE_MS, now);
 
   // Frescura en memoria (instancia caliente): ni motor ni CDN.
-  if (cached && now - cached.at < (cached.status === 200 ? TTL_OK_MS : TTL_MISS_MS)) {
-    if (cached.status === 200) return sendBusiness(res, cached.page, url, 'public, s-maxage=300, stale-while-revalidate=600');
+  if (rescate && now - rescate.at < TTL_OK_MS) {
+    try {
+      return sendBusiness(res, rescate.page, url, 'public, s-maxage=300, stale-while-revalidate=600');
+    } catch (err) {
+      // Estructuralmente no debería pasar: al Map sólo entran páginas que YA se
+      // renderizaron bien una vez (más abajo). Si igual ocurre, la entrada se
+      // descarta para que la próxima visita vuelva a preguntarle al motor en vez
+      // de repetir el mismo 500 durante los 5 minutos del TTL.
+      okCache.delete(raw);
+      return sendRenderFailure(res, raw, err, 'render_cached');
+    }
+  }
+
+  // 404 fresco: el motor ya dijo que no existe hace menos de un minuto.
+  if (cacheGet(missCache, raw, TTL_MISS_MS, now)) {
     res.setHeader('Cache-Control', 'public, s-maxage=60');
     return res.status(404).send(renderNotFound());
   }
 
+  let fetched;
   try {
-    const r = await fetchPage(raw);
-    cache.set(raw, { at: now, ...r });
-    if (r.status === 200) return sendBusiness(res, r.page, url, 'public, s-maxage=300, stale-while-revalidate=600');
-    // 404 con caché corta: si el negocio publica recién, lo ve en ~1 min.
-    res.setHeader('Cache-Control', 'public, s-maxage=60');
-    return res.status(404).send(renderNotFound());
-  } catch {
-    // Motor caído o lento. Copia vieja (hasta 24 h) antes que un error: los
-    // datos de un negocio cambian poco y el link lo abre un cliente final.
-    if (cached && cached.status === 200 && now - cached.at < STALE_RESCUE_MS) {
-      return sendBusiness(res, cached.page, url, 'public, s-maxage=60');
+    fetched = await fetchPage(raw);
+  } catch (err) {
+    // Motor caído, lento, o hablando otro contrato. En NINGUNO de esos casos se
+    // toca el Map: la copia vieja es exactamente lo que salva a este negocio, y
+    // pisarla con el resultado de un fallo es perder la red justo cuando se cae.
+    const step = err instanceof EngineShapeError ? 'engine_shape' : 'engine_fetch';
+    if (rescate) {
+      // Copia vieja (hasta 24 h) antes que un error: los datos de un negocio
+      // cambian poco y el link lo abre un cliente final.
+      logFailure({ step, slug: raw, served: 'stale', stale_age_s: Math.round((now - rescate.at) / 1000), ...describeError(err) });
+      try {
+        return sendBusiness(res, rescate.page, url, 'public, s-maxage=60');
+      } catch (renderErr) {
+        return sendRenderFailure(res, raw, renderErr, 'render_stale');
+      }
     }
+    logFailure({ step, slug: raw, served: '503', ...describeError(err) });
     res.setHeader('Cache-Control', 'no-store');
     return res.status(503).send(renderUnavailable());
   }
+
+  if (fetched.status !== 200) {
+    // 404 REAL del motor: no existe o no está publicada. Acá sí se pisa la copia
+    // de rescate, y debe pisarse — si el dueño despublicó, seguir sirviendo la
+    // copia vieja cuando el motor se caiga sería volver a publicar lo que pidió
+    // bajar. Caché corta: si publica recién, lo ve en ~1 min.
+    okCache.delete(raw);
+    cacheSet(missCache, raw, { at: now }, MISS_MAX, TTL_MISS_MS, now);
+    res.setHeader('Cache-Control', 'public, s-maxage=60');
+    return res.status(404).send(renderNotFound());
+  }
+
+  // Se RENDERIZA ANTES DE CACHEAR. Si entrara al Map una página que explota al
+  // dibujarse, reemplazaría a la copia buena anterior Y la visita siguiente
+  // —que sale por el camino de caché, sin volver a preguntarle al motor—
+  // heredaría el mismo 500 sin forma de recuperarse sola.
+  let built;
+  try {
+    built = buildBusinessPage(fetched.page, url);
+  } catch (err) {
+    return sendRenderFailure(res, raw, err, 'render');
+  }
+  missCache.delete(raw);
+  cacheSet(okCache, raw, { at: now, page: fetched.page, publishedAt: fetched.publishedAt }, OK_MAX, STALE_RESCUE_MS, now);
+  return sendBuilt(res, built, 'public, s-maxage=300, stale-while-revalidate=600');
 };
 
 // Para `test/page.test.mjs`, que corre con node pelado. Se cuelgan como
@@ -398,6 +591,7 @@ module.exports = async (req, res) => {
 // Vercel espera, y para no partir el archivo en módulos que el bundler tenga que
 // rastrear. No las use nadie más.
 module.exports.__internals = {
-  safeHref, renderBusiness, setSecurityHeaders, sendBusiness, buildJsonLd, buildCsp, jsonLdHash,
-  SCHEMES_WEBSITE, SCHEMES_MACHINE, SCHEMES_TEL, CSP,
+  safeHref, renderBusiness, setSecurityHeaders, sendBusiness, buildBusinessPage, buildJsonLd, buildCsp, jsonLdHash,
+  SCHEMES_WEBSITE, SCHEMES_MACHINE, SCHEMES_TEL, CSP, EngineShapeError, RESERVED_SLUGS,
+  okCache, missCache, cacheGet, cacheSet, OK_MAX, MISS_MAX,
 };
