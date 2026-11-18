@@ -31,7 +31,7 @@ const NAV = uno(/<nav class="container nav"[\s\S]*?<\/nav>/, 'nav').replace(/hre
 const PIE = uno(/<footer class="foot">[\s\S]*?<\/footer>/, 'footer')
   .replace(/href="privacidad\.html"/g, 'href="/privacidad"').replace(/href="terminos\.html"/g, 'href="/terminos"');
 const ORG = {
-  '@type': 'Organization', '@id': SITE + '/#org', name: 'VOS', url: SITE + '/', logo: SITE + '/og.png', email: 'contact@actavia.tech',
+  '@type': 'Organization', '@id': SITE + '/#org', name: 'VOS', url: SITE + '/', logo: SITE + '/og.png', email: 'contact@actavia.tech', telephone: '+5491176539950',
   parentOrganization: { '@type': 'Organization', '@id': 'https://actavia.tech/#org', name: 'Actavia LLC', url: 'https://actavia.tech' },
 };
 
