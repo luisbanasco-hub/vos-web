@@ -21,6 +21,14 @@
       "destination": "/proyecto-en-pozo-consultas-whatsapp.html"
     },
     {
+      "source": "/en",
+      "destination": "/en.html"
+    },
+    {
+      "source": "/pt",
+      "destination": "/pt.html"
+    },
+    {
       "source": "/:pageSlug",
       "destination": "/api/page?slug=:pageSlug"
     }
@@ -48,7 +56,7 @@
       ]
     },
     {
-      "source": "/(index.html|privacidad|privacidad.html|terminos|terminos.html|precalificar-interesados-inmobiliarios|precalificar-interesados-inmobiliarios.html|proyecto-en-pozo-consultas-whatsapp|proyecto-en-pozo-consultas-whatsapp.html|whatsapp-para-desarrolladoras-inmobiliarias|whatsapp-para-desarrolladoras-inmobiliarias.html)",
+      "source": "/(index.html|privacidad|privacidad.html|terminos|terminos.html|precalificar-interesados-inmobiliarios|precalificar-interesados-inmobiliarios.html|proyecto-en-pozo-consultas-whatsapp|proyecto-en-pozo-consultas-whatsapp.html|whatsapp-para-desarrolladoras-inmobiliarias|whatsapp-para-desarrolladoras-inmobiliarias.html|en|en.html|pt|pt.html)",
       "headers": [
         {
           "key": "Content-Security-Policy",

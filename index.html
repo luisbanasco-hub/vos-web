@@ -6,6 +6,10 @@
 <title>vos · El asistente de WhatsApp para desarrolladoras inmobiliarias</title>
 <meta name="description" content="vos atiende WhatsApp con los datos de cada proyecto: tipologías, etapa de obra y visitas. Precalifica al interesado y le pasa la ficha a tu equipo comercial.">
 <link rel="canonical" href="https://vos.chat/">
+<link rel="alternate" hreflang="es" href="https://vos.chat/">
+<link rel="alternate" hreflang="en" href="https://vos.chat/en">
+<link rel="alternate" hreflang="pt" href="https://vos.chat/pt">
+<link rel="alternate" hreflang="x-default" href="https://vos.chat/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="vos.chat">
 <meta property="og:url" content="https://vos.chat/">
@@ -50,6 +54,9 @@
   .navlinks a{color:var(--sobre-hondo);text-decoration:none}
   .navlinks a:hover{color:#fff}
   .navlinks a.btn-crema,.navlinks a.btn-crema:hover{color:var(--hondo)}
+  .langs{display:inline-flex;border:1px solid var(--borde-hondo);border-radius:999px;overflow:hidden}
+  .navlinks .langs a{font-size:13px;font-weight:700;letter-spacing:.06em;padding:8px 11px;min-height:36px;display:inline-flex;align-items:center;color:var(--sobre-hondo)}
+  .navlinks .langs a[aria-current="true"]{background:var(--crema);color:var(--hondo)}
   .navlinks .hide-sm{display:none}
   @media(min-width:760px){.navlinks .hide-sm{display:inline}}
   .herogrid{display:flex;flex-wrap:wrap;gap:48px;align-items:center;padding-top:56px;padding-bottom:88px}
@@ -222,6 +229,7 @@
       <a class="hide-sm" href="#cuidado">Cumplimiento</a>
       <a class="hide-sm" href="#familia">Familia</a>
       <a class="hide-sm" href="/whatsapp-para-desarrolladoras-inmobiliarias">Guías</a>
+      <span class="langs" role="group" aria-label="Idioma / Language"><a href="/" hreflang="es" lang="es" aria-current="true">ES</a><a href="/en" hreflang="en" lang="en">EN</a><a href="/pt" hreflang="pt" lang="pt">PT</a></span>
       <a class="btn btn-crema" href="#anotarme">Pedir una demo</a>
     </div>
   </nav>

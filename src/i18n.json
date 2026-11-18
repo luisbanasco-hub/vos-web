@@ -1,0 +1,657 @@
+{
+ "_nota": "Textos de la home en inglés y portugués. Cada fila: [español tal cual está en index.html, inglés, portugués]. build.mjs falla si un texto en español ya no existe.",
+ "textos": [
+  [
+   "Principal",
+   "Main",
+   "Principal"
+  ],
+  [
+   "vos, inicio",
+   "vos, home",
+   "vos, início"
+  ],
+  [
+   "Cómo funciona",
+   "How it works",
+   "Como funciona"
+  ],
+  [
+   "Canales",
+   "Channels",
+   "Canais"
+  ],
+  [
+   "Cumplimiento",
+   "Compliance",
+   "Conformidade"
+  ],
+  [
+   "Familia",
+   "Family",
+   "Família"
+  ],
+  [
+   "Guías",
+   "Guides",
+   "Guias"
+  ],
+  [
+   "Pedir una demo",
+   "Request a demo",
+   "Pedir uma demo"
+  ],
+  [
+   "Para desarrolladoras inmobiliarias",
+   "For real estate developers",
+   "Para incorporadoras imobiliárias"
+  ],
+  [
+   "Tus interesados preguntan a toda hora. vos responde con los datos de cada proyecto.",
+   "Your prospects ask at all hours. VOS answers with each project’s details.",
+   "Seus interessados perguntam a qualquer hora. O VOS responde com os dados de cada projeto."
+  ],
+  [
+   "Un asistente que atiende tu WhatsApp: conoce cada edificio, tipología y etapa de obra, precalifica al interesado y le pasa el pedido de visita a tu equipo.",
+   "An assistant that answers your WhatsApp: it knows every building, unit type and construction stage, pre-qualifies each prospect and passes site-visit requests to your team.",
+   "Um assistente que atende seu WhatsApp: conhece cada prédio, tipologia e etapa da obra, pré-qualifica o interessado e passa o pedido de visita para sua equipe."
+  ],
+  [
+   "Ver cómo funciona",
+   "See how it works",
+   "Ver como funciona"
+  ],
+  [
+   "Tu número · Tus datos · Tu última palabra",
+   "Your number · Your data · Your final say",
+   "Seu número · Seus dados · Sua palavra final"
+  ],
+  [
+   "Ejemplo de conversación de WhatsApp entre un interesado y vos",
+   "Example WhatsApp conversation between a prospect and VOS",
+   "Exemplo de conversa no WhatsApp entre um interessado e o VOS"
+  ],
+  [
+   "Tu desarrolladora",
+   "Your company",
+   "Sua incorporadora"
+  ],
+  [
+   "Atiende vos · WhatsApp",
+   "Answered by vos · WhatsApp",
+   "Atendido pelo vos · WhatsApp"
+  ],
+  [
+   "Hola, ¿quedan 2 ambientes en el edificio 3? ¿Puedo ir a ver la obra?",
+   "Hi, are there any one-bedroom units left in building 3? Can I go see the site?",
+   "Olá, ainda tem unidades de 1 quarto no prédio 3? Posso ir ver a obra?"
+  ],
+  [
+   "¡Hola! En el Edificio 3 hay unidades de 2 ambientes en planos. La obra está en estructura. ¿Lo buscás para vivir o para invertir?",
+   "Hi! Building 3 has one-bedroom units on the plans. Construction is at the structural stage. Is it to live in or to invest?",
+   "Olá! No Prédio 3 há unidades de 1 quarto na planta. A obra está na fase de estrutura. É para morar ou para investir?"
+  ],
+  [
+   "Para vivir. El sábado a la mañana me queda bien.",
+   "To live in. Saturday morning works for me.",
+   "Para morar. Sábado de manhã fica bom para mim."
+  ],
+  [
+   "Perfecto. Le paso tu pedido de visita del sábado a la mañana al equipo comercial y te confirman por acá.",
+   "Great. I’ll pass your Saturday-morning visit request to the sales team and they’ll confirm here.",
+   "Perfeito. Vou passar seu pedido de visita de sábado de manhã para a equipe comercial e eles confirmam por aqui."
+  ],
+  [
+   "Ficha enviada al equipo · visita a obra",
+   "Lead sent to the team · site visit",
+   "Ficha enviada à equipe · visita à obra"
+  ],
+  [
+   "Qué hace vos",
+   "What VOS does",
+   "O que o VOS faz"
+  ],
+  [
+   "Del primer mensaje a la visita, sin que nadie quede esperando.",
+   "From the first message to the site visit, with no one left waiting.",
+   "Da primeira mensagem à visita, sem ninguém ficar esperando."
+  ],
+  [
+   "Conoce cada proyecto",
+   "Knows every project",
+   "Conhece cada projeto"
+  ],
+  [
+   "Edificios, tipologías, amenities y etapa de obra. Si tenés varios proyectos, entiende de cuál te están hablando.",
+   "Buildings, unit types, amenities and construction stage. If you have several projects, it understands which one is being asked about.",
+   "Prédios, tipologias, áreas comuns e etapa da obra. Se você tem vários projetos, entende de qual estão falando."
+  ],
+  [
+   "Precalifica",
+   "Pre-qualifies",
+   "Pré-qualifica"
+  ],
+  [
+   "Para vivir o para invertir, cuántos ambientes, en qué plazo. Pregunta lo justo, en el tono de tu marca.",
+   "To live in or to invest, how many rooms, what timeframe. It asks just enough, in your brand’s tone.",
+   "Para morar ou investir, quantos quartos, em que prazo. Pergunta o necessário, no tom da sua marca."
+  ],
+  [
+   "Toma el pedido de visita",
+   "Takes the visit request",
+   "Registra o pedido de visita"
+  ],
+  [
+   "A obra o al showroom, con día y franja horaria. La confirma tu equipo: vos no promete lo que no puede cumplir.",
+   "To the site or the showroom, with a day and time slot. Your team confirms it: VOS never promises what it can’t deliver.",
+   "À obra ou ao showroom, com dia e faixa de horário. Sua equipe confirma: o VOS não promete o que não pode cumprir."
+  ],
+  [
+   "Avisa a tu equipo",
+   "Notifies your team",
+   "Avisa sua equipe"
+  ],
+  [
+   "La ficha del interesado llega por WhatsApp y por email a la persona que elijas, proyecto por proyecto.",
+   "The prospect’s details arrive by WhatsApp and email to the person you choose, project by project.",
+   "A ficha do interessado chega por WhatsApp e por e-mail para a pessoa que você escolher, projeto por projeto."
+  ],
+  [
+   "Un cerebro, tres canales",
+   "One brain, three channels",
+   "Um cérebro, três canais"
+  ],
+  [
+   "Cargás el proyecto una vez. Responde igual en todos lados.",
+   "Load the project once. It answers the same everywhere.",
+   "Você cadastra o projeto uma vez. Ele responde igual em todos os lugares."
+  ],
+  [
+   "Tipologías, etapas y textos aprobados viven en un solo lugar. Cuando algo cambia, cambia para todos los canales a la vez. Y si operás en más de un país, cada uno puede tener su propio número.",
+   "Unit types, stages and approved texts live in one place. When something changes, it changes for every channel at once. And if you operate in more than one country, each can have its own number.",
+   "Tipologias, etapas e textos aprovados ficam em um só lugar. Quando algo muda, muda em todos os canais ao mesmo tempo. E se você opera em mais de um país, cada um pode ter seu próprio número."
+  ],
+  [
+   "Activo",
+   "Live",
+   "Ativo"
+  ],
+  [
+   "Próximamente",
+   "Coming soon",
+   "Em breve"
+  ],
+  [
+   "Chat en tu web",
+   "Chat on your website",
+   "Chat no seu site"
+  ],
+  [
+   "Cuida lo que no se puede prometer",
+   "It guards what can’t be promised",
+   "Cuida do que não se pode prometer"
+  ],
+  [
+   "Vender en pozo tiene reglas. vos las respeta.",
+   "Selling off-plan has rules. VOS follows them.",
+   "Vender na planta tem regras. O VOS as respeita."
+  ],
+  [
+   "Qué se puede responder en cada etapa, en nuestra guía sobre",
+   "What can be said at each stage, in our guide (in Spanish) on",
+   "O que se pode responder em cada etapa, no nosso guia (em espanhol) sobre"
+  ],
+  [
+   "consultas de un proyecto en pozo",
+   "inquiries about an off-plan project",
+   "consultas de um projeto na planta"
+  ],
+  [
+   "No promete rentabilidad",
+   "It doesn’t promise returns",
+   "Não promete rentabilidade"
+  ],
+  [
+   "Ni retornos, ni revalorización, ni \"es una buena inversión\". Si el interesado insiste, lo deriva a tu equipo.",
+   "No returns, no appreciation, no \"it’s a good investment\". If the prospect insists, it hands them to your team.",
+   "Nem retorno, nem valorização, nem \"é um bom investimento\". Se o interessado insiste, ele o encaminha à sua equipe."
+  ],
+  [
+   "Respeta la etapa de cada proyecto",
+   "It respects each project’s stage",
+   "Respeita a etapa de cada projeto"
+  ],
+  [
+   "Informativo, oferta en preparación o venta de unidades: lo que puede decir cambia según la etapa que marques.",
+   "Information only, offering in preparation or units for sale: what it can say changes with the stage you set.",
+   "Informativo, oferta em preparação ou venda de unidades: o que ele pode dizer muda conforme a etapa que você define."
+  ],
+  [
+   "Textos que aprueba tu equipo",
+   "Texts your team approves",
+   "Textos que sua equipe aprova"
+  ],
+  [
+   "Las frases sensibles salen de un texto aprobado por tu desarrolladora, no de la improvisación del modelo.",
+   "Sensitive phrases come from text approved by your company, not from the model improvising.",
+   "As frases sensíveis saem de um texto aprovado pela sua incorporadora, não da improvisação do modelo."
+  ],
+  [
+   "Tu número, tu WhatsApp",
+   "Your number, your WhatsApp",
+   "Seu número, seu WhatsApp"
+  ],
+  [
+   "No cambiás nada. Solo dejás de perder interesados.",
+   "You change nothing. You just stop losing prospects.",
+   "Você não muda nada. Só para de perder interessados."
+  ],
+  [
+   "Tu equipo sigue usando el WhatsApp Business de siempre, con el número que ya está en tus carteles y tus redes, y con todo el historial. vos contesta cuando nadie llega, y ustedes ven cada conversación en el teléfono.",
+   "Your team keeps using the same WhatsApp Business, with the number already on your signs and social media, and with the full history. VOS answers when no one gets to it, and you see every conversation on the phone.",
+   "Sua equipe continua usando o mesmo WhatsApp Business, com o número que já está nas suas placas e redes sociais, e com todo o histórico. O VOS responde quando ninguém consegue, e vocês veem cada conversa no telefone."
+  ],
+  [
+   "El número de siempre",
+   "The same number",
+   "O número de sempre"
+  ],
+  [
+   "El que está en el cartel de obra y en tus avisos. Ese mismo.",
+   "The one on the construction sign and in your ads. That one.",
+   "O que está na placa da obra e nos seus anúncios. Esse mesmo."
+  ],
+  [
+   "La app de siempre",
+   "The same app",
+   "O app de sempre"
+  ],
+  [
+   "Ves las conversaciones, ves lo que respondió vos y contestás cuando querés.",
+   "You see the conversations, you see what VOS answered, and you reply whenever you want.",
+   "Você vê as conversas, vê o que o VOS respondeu e responde quando quiser."
+  ],
+  [
+   "Tu equipo manda",
+   "Your team is in charge",
+   "Sua equipe manda"
+  ],
+  [
+   "Si alguien de tu equipo escribe, vos se hace a un lado. Cuando quieran que vuelva, se lo piden.",
+   "If someone on your team writes, VOS steps aside. When you want it back, you just ask.",
+   "Se alguém da sua equipe escreve, o VOS sai de cena. Quando quiserem que volte, é só pedir."
+  ],
+  [
+   "Algunas funciones de WhatsApp cambian al conectar.",
+   "Some WhatsApp features change when you connect.",
+   "Algumas funções do WhatsApp mudam ao conectar."
+  ],
+  [
+   "Ver qué cambia en tu WhatsApp",
+   "See what changes in your WhatsApp",
+   "Ver o que muda no seu WhatsApp"
+  ],
+  [
+   "Solo hace falta abrir el WhatsApp Business cada tanto, como ya hacen todos los días.",
+   "You just need to open WhatsApp Business every so often, as you already do every day.",
+   "Só é preciso abrir o WhatsApp Business de vez em quando, como vocês já fazem todos os dias."
+  ],
+  [
+   "Precio",
+   "Pricing",
+   "Preço"
+  ],
+  [
+   "Pagás por lo que usás.",
+   "You pay for what you use.",
+   "Você paga pelo que usa."
+  ],
+  [
+   "Estamos arrancando con las primeras desarrolladoras, y el precio final lo fijamos con lo que aprendamos ahí, no antes. Lo que ya está decidido es cómo funciona:",
+   "We are starting with the first developers, and we will set the final price based on what we learn there, not before. What is already decided is how it works:",
+   "Estamos começando com as primeiras incorporadoras, e o preço final será definido com o que aprendermos aí, não antes. O que já está decidido é como funciona:"
+  ],
+  [
+   "Plan vos",
+   "VOS plan",
+   "Plano VOS"
+  ],
+  [
+   "Se cobra por uso.",
+   "Usage-based billing.",
+   "Cobrança por uso."
+  ],
+  [
+   "Sin contratos largos ni permanencia: cancelás cuando quieras.",
+   "No long contracts or lock-in: cancel whenever you want.",
+   "Sem contratos longos nem fidelidade: cancele quando quiser."
+  ],
+  [
+   "Lo que atiende tu equipo desde el celular no cuesta nada.",
+   "What your team handles from the phone costs nothing.",
+   "O que sua equipe atende pelo celular não custa nada."
+  ],
+  [
+   "vos cubre lo que ustedes no llegan a atender.",
+   "VOS covers what you can’t get to.",
+   "O VOS cobre o que vocês não conseguem atender."
+  ],
+  [
+   "El precio lo ves antes de pagar un peso.",
+   "You see the price before paying anything.",
+   "Você vê o preço antes de pagar qualquer coisa."
+  ],
+  [
+   "Pedir una demo no te compromete a nada.",
+   "Requesting a demo commits you to nothing.",
+   "Pedir uma demo não compromete a nada."
+  ],
+  [
+   "Todos tus proyectos en un mismo asistente",
+   "All your projects in one assistant",
+   "Todos os seus projetos em um só assistente"
+  ],
+  [
+   "Fichas de interesados por WhatsApp y email",
+   "Prospect details by WhatsApp and email",
+   "Fichas de interessados por WhatsApp e e-mail"
+  ],
+  [
+   "Tu número de siempre, tu WhatsApp de siempre",
+   "Your usual number, your usual WhatsApp",
+   "Seu número de sempre, seu WhatsApp de sempre"
+  ],
+  [
+   "Textos sensibles aprobados por tu equipo",
+   "Sensitive texts approved by your team",
+   "Textos sensíveis aprovados pela sua equipe"
+  ],
+  [
+   "Tus datos, siempre tuyos",
+   "Your data, always yours",
+   "Seus dados, sempre seus"
+  ],
+  [
+   "Hecho para el desarrollo inmobiliario. Entrenable para tu sector.",
+   "Built for real estate development. Trainable for your industry.",
+   "Feito para o desenvolvimento imobiliário. Treinável para o seu setor."
+  ],
+  [
+   "vos nació para atender interesados en proyectos. Si tu negocio es otro, lo entrenamos con tus datos y tus reglas.",
+   "VOS was born to handle prospects for real estate projects. If your business is different, we train it with your data and your rules.",
+   "O VOS nasceu para atender interessados em projetos. Se o seu negócio é outro, nós o treinamos com seus dados e suas regras."
+  ],
+  [
+   "Contanos tu caso",
+   "Tell us about your case",
+   "Conte seu caso"
+  ],
+  [
+   "La familia Actavia",
+   "The Actavia family",
+   "A família Actavia"
+  ],
+  [
+   "Del pozo al alquiler: tres productos que funcionan solos o juntos.",
+   "From the ground up to the lease: three products that work alone or together.",
+   "Da planta ao aluguel: três produtos que funcionam sozinhos ou juntos."
+  ],
+  [
+   "VOS, BloqueRaíz y Avala los desarrolla Actavia. Cada uno resuelve una etapa de un proyecto inmobiliario: podés usar uno, dos o los tres.",
+   "VOS, BloqueRaíz and Avala are built by Actavia. Each one handles a stage of a real estate project: use one, two or all three.",
+   "VOS, BloqueRaíz e Avala são desenvolvidos pela Actavia. Cada um resolve uma etapa de um projeto imobiliário: use um, dois ou os três."
+  ],
+  [
+   "Financiar",
+   "Finance",
+   "Financiar"
+  ],
+  [
+   "Tokenización de proyectos en pozo, en obra o terminados: el fideicomiso del desarrollador vende partes a inversores verificados, sin deuda.",
+   "Tokenization for pre-construction, in-progress or finished projects: the developer’s trust sells fractions to verified investors, with no debt.",
+   "Tokenização de projetos na planta, em obra ou prontos: o fideicomisso do incorporador vende frações a investidores verificados, sem dívida."
+  ],
+  [
+   "Vender · Estás acá",
+   "Sell · You are here",
+   "Vender · Você está aqui"
+  ],
+  [
+   "Un asistente que atiende WhatsApp con los datos de cada proyecto, precalifica a cada interesado y le pasa la ficha al equipo comercial.",
+   "An assistant that answers WhatsApp with each project’s details, pre-qualifies every prospect and hands the lead to the sales team.",
+   "Um assistente que atende o WhatsApp com os dados de cada projeto, pré-qualifica cada interessado e passa a ficha para a equipe comercial."
+  ],
+  [
+   "Alquilar",
+   "Rent",
+   "Alugar"
+  ],
+  [
+   "La garantía de alquiler que se ejecuta sola: el respaldo queda bloqueado en un contrato público, a nombre del inquilino, sin garante propietario.",
+   "The rental guarantee that enforces itself: the deposit is locked in a public contract, in the tenant’s name, with no property guarantor.",
+   "A garantia de aluguel que se executa sozinha: o respaldo fica bloqueado em um contrato público, em nome do inquilino, sem fiador."
+  ],
+  [
+   "Juntos: la desarrolladora financia la obra con BloqueRaíz, atiende a sus interesados con VOS y, cuando las unidades se alquilan, Avala resuelve la garantía y el cobro.",
+   "Together: the developer funds the build with BloqueRaíz, answers prospects with VOS and, once the units are rented, Avala handles the guarantee and the payments.",
+   "Juntos: a incorporadora financia a obra com o BloqueRaíz, atende os interessados com o VOS e, quando as unidades são alugadas, a Avala resolve a garantia e a cobrança."
+  ],
+  [
+   "Demo con tu proyecto",
+   "Demo with your project",
+   "Demo com o seu projeto"
+  ],
+  [
+   "Que ningún interesado se quede sin respuesta.",
+   "No prospect left without an answer.",
+   "Que nenhum interessado fique sem resposta."
+  ],
+  [
+   "Dejanos tu contacto y te mostramos vos funcionando con uno de tus proyectos. Si preferís, alguien del equipo te llama y te lo explica sin vueltas.",
+   "Leave your contact and we’ll show you VOS working with one of your projects. If you prefer, someone on our team will call you and explain it plainly.",
+   "Deixe seu contato e mostramos o VOS funcionando com um dos seus projetos. Se preferir, alguém da equipe liga para você e explica sem rodeios."
+  ],
+  [
+   "Tu email",
+   "Your email",
+   "Seu e-mail"
+  ],
+  [
+   "Tu WhatsApp (opcional)",
+   "Your WhatsApp (optional)",
+   "Seu WhatsApp (opcional)"
+  ],
+  [
+   "No completar",
+   "Do not fill in",
+   "Não preencher"
+  ],
+  [
+   "Dejanos tu número si preferís que te llamemos en vez de escribirte.",
+   "Leave your number if you’d rather we call than write.",
+   "Deixe seu número se preferir que liguemos em vez de escrever."
+  ],
+  [
+   "Uy, algo falló. Probá de nuevo.",
+   "Oops, something went wrong. Please try again.",
+   "Ops, algo deu errado. Tente de novo."
+  ],
+  [
+   "Listo. Te escribimos pronto.",
+   "Done. We’ll be in touch soon.",
+   "Pronto. Escrevemos em breve."
+  ],
+  [
+   "Gracias. Coordinamos la demo con uno de tus proyectos.",
+   "Thank you. We’ll set up the demo with one of your projects.",
+   "Obrigado. Combinamos a demo com um dos seus projetos."
+  ],
+  [
+   "Cerrar",
+   "Close",
+   "Fechar"
+  ],
+  [
+   "Qué cambia en tu WhatsApp",
+   "What changes in your WhatsApp",
+   "O que muda no seu WhatsApp"
+  ],
+  [
+   "Al conectar vos, algunas funciones de WhatsApp Business dejan de estar disponibles. La mayoría de los negocios no las usa, pero preferimos que lo sepas antes:",
+   "When you connect VOS, some WhatsApp Business features stop being available. Most businesses don’t use them, but we’d rather you know beforehand:",
+   "Ao conectar o VOS, algumas funções do WhatsApp Business deixam de estar disponíveis. A maioria das empresas não as usa, mas preferimos que você saiba antes:"
+  ],
+  [
+   "Listas de difusión:",
+   "Broadcast lists:",
+   "Listas de transmissão:"
+  ],
+  [
+   "se desactivan (las que tengas quedan como solo lectura).",
+   "are disabled (existing ones become read-only).",
+   "são desativadas (as que você tiver ficam só para leitura)."
+  ],
+  [
+   "Ubicación en vivo:",
+   "Live location:",
+   "Localização em tempo real:"
+  ],
+  [
+   "no funciona.",
+   "doesn’t work.",
+   "não funciona."
+  ],
+  [
+   "Editar o borrar mensajes enviados:",
+   "Editing or deleting sent messages:",
+   "Editar ou apagar mensagens enviadas:"
+  ],
+  [
+   "no disponible.",
+   "not available.",
+   "não disponível."
+  ],
+  [
+   "Foto de perfil:",
+   "Profile photo:",
+   "Foto de perfil:"
+  ],
+  [
+   "no se puede cambiar después de conectar (dejala como querés antes).",
+   "can’t be changed after connecting (set it the way you want beforehand).",
+   "não pode ser alterada depois de conectar (deixe como quiser antes)."
+  ],
+  [
+   "Grupos y llamadas:",
+   "Groups and calls:",
+   "Grupos e chamadas:"
+  ],
+  [
+   "siguen funcionando normal en tu app, pero vos no participa.",
+   "keep working normally in your app, but VOS doesn’t take part.",
+   "continuam funcionando normalmente no seu app, mas o VOS não participa."
+  ],
+  [
+   "WhatsApp para Windows:",
+   "WhatsApp for Windows:",
+   "WhatsApp para Windows:"
+  ],
+  [
+   "no compatible.",
+   "not supported.",
+   "não compatível."
+  ],
+  [
+   "Y una condición importante:",
+   "And one important condition:",
+   "E uma condição importante:"
+  ],
+  [
+   "Tenés que abrir tu WhatsApp Business al menos una vez cada 13 días. Si no, WhatsApp desconecta vos automáticamente. Es una regla de WhatsApp, no nuestra.",
+   "You need to open your WhatsApp Business at least once every 13 days. Otherwise, WhatsApp disconnects VOS automatically. It’s WhatsApp’s rule, not ours.",
+   "Você precisa abrir seu WhatsApp Business pelo menos uma vez a cada 13 dias. Se não, o WhatsApp desconecta o VOS automaticamente. É uma regra do WhatsApp, não nossa."
+  ],
+  [
+   "¿Dudas? Escribinos antes de conectar y te lo explicamos sin vueltas.",
+   "Questions? Write to us before connecting and we’ll explain it plainly.",
+   "Dúvidas? Escreva antes de conectar e explicamos sem rodeios."
+  ],
+  [
+   "Guías:",
+   "Guides (in Spanish):",
+   "Guias (em espanhol):"
+  ],
+  [
+   "Proveedor de tecnología verificado de WhatsApp Business Platform",
+   "Verified WhatsApp Business Platform technology provider",
+   "Provedor de tecnologia verificado da WhatsApp Business Platform"
+  ],
+  [
+   "Privacidad",
+   "Privacy",
+   "Privacidade"
+  ],
+  [
+   "Términos",
+   "Terms",
+   "Termos"
+  ],
+  [
+   "Escribinos por WhatsApp",
+   "Message us on WhatsApp",
+   "Fale com a gente no WhatsApp"
+  ]
+ ],
+ "js": [
+  [
+   "'Probaste varias veces seguidas. Esperá unos minutos y volvé a intentar.'",
+   "'Too many attempts in a row. Wait a few minutes and try again.'",
+   "'Muitas tentativas seguidas. Espere alguns minutos e tente de novo.'"
+  ],
+  [
+   "'Ese email no parece válido. Revisalo y probá de nuevo.'",
+   "'That email doesn’t look valid. Check it and try again.'",
+   "'Esse e-mail não parece válido. Confira e tente de novo.'"
+  ],
+  [
+   "'Ese número no parece válido. Revisalo, o dejalo vacío.'",
+   "'That number doesn’t look valid. Check it, or leave it empty.'",
+   "'Esse número não parece válido. Confira ou deixe em branco.'"
+  ],
+  [
+   "'Uy, algo falló. Probá de nuevo.'",
+   "'Oops, something went wrong. Please try again.'",
+   "'Ops, algo deu errado. Tente de novo.'"
+  ],
+  [
+   "var LABEL = 'Pedir una demo';",
+   "var LABEL = 'Request a demo';",
+   "var LABEL = 'Pedir uma demo';"
+  ],
+  [
+   "'Enviando…'",
+   "'Sending…'",
+   "'Enviando…'"
+  ]
+ ],
+ "head": {
+  "en": {
+   "lang": "en",
+   "locale": "en_US",
+   "title": "vos · The WhatsApp assistant for real estate developers",
+   "desc": "VOS answers WhatsApp with each project’s details: unit types, construction stage and site visits. It pre-qualifies prospects and passes them to your sales team.",
+   "ogt": "vos · The WhatsApp assistant for real estate developers",
+   "ogd": "Answers your WhatsApp with each project’s details, pre-qualifies every prospect and passes site-visit requests to your team.",
+   "wa": "Hi, I'd like to know more about VOS for my company."
+  },
+  "pt": {
+   "lang": "pt",
+   "locale": "pt_BR",
+   "title": "vos · O assistente de WhatsApp para incorporadoras imobiliárias",
+   "desc": "O VOS atende o WhatsApp com os dados de cada projeto: tipologias, etapa da obra e visitas. Pré-qualifica o interessado e passa a ficha para a equipe comercial.",
+   "ogt": "vos · O assistente de WhatsApp para incorporadoras imobiliárias",
+   "ogd": "Atende seu WhatsApp com os dados de cada projeto, pré-qualifica cada interessado e passa o pedido de visita para sua equipe.",
+   "wa": "Olá, quero saber mais sobre o VOS para minha incorporadora."
+  }
+ }
+}
