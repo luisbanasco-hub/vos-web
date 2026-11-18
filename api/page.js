@@ -147,7 +147,11 @@ const INSTAGRAM_HANDLE = /^[A-Za-z0-9._]{1,30}$/;
 // URL. No se reservan nombres "por las dudas" (`robots`, `admin`, `shop`…):
 // eso le sacaria slugs legitimos a los negocios y, sobre todo, la lista
 // autoritativa de reservados es una decision de vos-app, no de acá.
-const RESERVED_SLUGS = new Set(['api', 'index', 'privacidad', 'terminos', 'videos']);
+// Rutas que ocupa este repo: las estáticas y los artículos (build.mjs).
+const RESERVED_SLUGS = new Set([
+  'api', 'index', 'privacidad', 'terminos', 'videos',
+  'whatsapp-para-desarrolladoras-inmobiliarias', 'precalificar-interesados-inmobiliarios', 'proyecto-en-pozo-consultas-whatsapp',
+]);
 
 const FAVICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%2312302A'/%3E%3Ctext x='7' y='27' font-family='Arial,sans-serif' font-weight='900' font-size='20' fill='%23F6F3EC'%3Ev%3C/text%3E%3Ccircle cx='28' cy='25' r='3.4' fill='%238CCBA6'/%3E%3C/svg%3E";
 
