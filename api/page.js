@@ -149,31 +149,31 @@ const INSTAGRAM_HANDLE = /^[A-Za-z0-9._]{1,30}$/;
 // autoritativa de reservados es una decision de vos-app, no de acá.
 const RESERVED_SLUGS = new Set(['api', 'index', 'privacidad', 'terminos', 'videos']);
 
-const FAVICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%2326201c'/%3E%3Cpath d='M20 8c7.2 0 13 4.5 13 10.1 0 5.6-5.8 10-13 10-1.6 0-3.2-.2-4.6-.6L8 31l1.7-5.2C7.7 24.1 6 21.4 6 18.1 6 12.5 12.8 8 20 8Z' fill='%23c8993c'/%3E%3Ccircle cx='14.4' cy='18.3' r='2.1' fill='%2326201c'/%3E%3Ccircle cx='20' cy='18.3' r='2.1' fill='%2326201c'/%3E%3Ccircle cx='25.6' cy='18.3' r='2.1' fill='%2326201c'/%3E%3C/svg%3E";
+const FAVICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%2312302A'/%3E%3Ctext x='7' y='27' font-family='Arial,sans-serif' font-weight='900' font-size='20' fill='%23F6F3EC'%3Ev%3C/text%3E%3Ccircle cx='28' cy='25' r='3.4' fill='%238CCBA6'/%3E%3C/svg%3E";
 
-// Misma identidad que index.html: fondo cálido oscuro, dorado, Fraunces para
-// los títulos, Hanken Grotesk para el cuerpo. Teléfono primero: una columna,
+// Misma identidad que index.html: verde hondo, crema y el verde señal, Archivo
+// para los títulos, DM Sans para el cuerpo. Teléfono primero: una columna,
 // CTA de WhatsApp fija abajo, tipografías fluidas.
 const BASE_CSS = `
-:root{--ink:#26201c;--gold:#c8993c;--bone:#f6f0e6;--camel:#d8b98a;--clay:#b6764a;--paper:#f3ead9}
+:root{--ink:#0B1F1A;--hondo:#12302A;--senal:#8CCBA6;--crema:#F6F3EC;--suave:#DCE5DF;--linea:rgba(220,229,223,.18)}
 *{box-sizing:border-box}html,body{margin:0}
-body{font-family:'Hanken Grotesk',system-ui,sans-serif;background:#1b1611;color:var(--bone);-webkit-font-smoothing:antialiased;min-height:100vh}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--hondo);color:var(--crema);-webkit-font-smoothing:antialiased;min-height:100vh}
 .wrap{max-width:560px;margin:0 auto;padding:34px 22px 120px}
-h1{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:clamp(30px,8vw,42px);line-height:1.08;margin:10px 0 0;color:var(--bone)}
-.rubro{font-weight:600;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--camel);margin:14px 0 0}
+h1{font-family:'Archivo',system-ui,sans-serif;font-weight:800;font-size:clamp(30px,8vw,42px);line-height:1.06;letter-spacing:-.02em;margin:10px 0 0;color:var(--crema)}
+.rubro{font-weight:700;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--senal);margin:14px 0 0}
 .sec{margin-top:34px}
-.sec h2{font-family:'Fraunces',Georgia,serif;font-weight:500;font-size:20px;color:var(--camel);margin:0 0 12px}
+.sec h2{font-family:'Archivo',system-ui,sans-serif;font-weight:700;font-size:20px;color:var(--suave);margin:0 0 12px}
 .cat{list-style:none;margin:0;padding:0}
-.cat li{display:flex;justify-content:space-between;gap:14px;align-items:baseline;padding:11px 0;border-bottom:1px solid rgba(216,185,138,.16);font-size:16px}
+.cat li{display:flex;justify-content:space-between;gap:14px;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--linea);font-size:16px}
 .cat li:last-child{border-bottom:none}
-.cat .p{font-weight:700;color:var(--gold);white-space:nowrap}
-.info p{margin:0 0 10px;font-size:15.5px;line-height:1.55;opacity:.92}
-.info a{color:var(--camel)}
-.wa-bar{position:fixed;left:0;right:0;bottom:0;padding:14px 22px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(27,22,17,.86) 34%,#1b1611 78%)}
-.wa-btn{display:flex;align-items:center;justify-content:center;gap:10px;max-width:516px;margin:0 auto;height:56px;border-radius:16px;background:var(--gold);color:var(--ink);font-weight:800;font-size:17px;text-decoration:none;box-shadow:0 10px 30px rgba(200,153,60,.35)}
+.cat .p{font-weight:700;color:var(--senal);white-space:nowrap}
+.info p{margin:0 0 10px;font-size:15.5px;line-height:1.55;color:var(--suave)}
+.info a{color:var(--senal)}
+.wa-bar{position:fixed;left:0;right:0;bottom:0;padding:14px 22px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(18,48,42,.88) 34%,#12302A 78%)}
+.wa-btn{display:flex;align-items:center;justify-content:center;gap:10px;max-width:516px;margin:0 auto;height:56px;border-radius:999px;background:var(--senal);color:var(--ink);font-weight:800;font-size:17px;text-decoration:none}
 .wa-btn svg{flex:none}
-.foot{margin-top:44px;font-size:12.5px;opacity:.55}
-.foot a{color:var(--camel);text-decoration:none}
+.foot{margin-top:44px;font-size:13px;color:#B9C7BF}
+.foot a{color:var(--suave);text-decoration:none}
 `;
 
 function head({ title, description, url, jsonLd }) {
@@ -192,13 +192,13 @@ function head({ title, description, url, jsonLd }) {
 ${url ? `<meta property="og:url" content="${esc(url)}">\n<link rel="canonical" href="${esc(url)}">` : ''}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
 ${jsonLd ? `<script type="application/ld+json">${jsonLd}</script>` : ''}
 <style>${BASE_CSS}</style>
 </head>`;
 }
 
-const WA_ICON = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3c5 0 9 3.6 9 8s-4 8-9 8c-1.1 0-2.2-.16-3.2-.46L4 20l1.2-3.7C3.8 15 3 13.6 3 11c0-4.4 4-8 9-8Z" fill="#26201c"/></svg>`;
+const WA_ICON = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3c5 0 9 3.6 9 8s-4 8-9 8c-1.1 0-2.2-.16-3.2-.46L4 20l1.2-3.7C3.8 15 3 13.6 3 11c0-4.4 4-8 9-8Z" fill="#0B1F1A"/></svg>`;
 
 /** Descripción SOLO con datos reales presentes, para <meta> y OG. */
 function buildDescription(page) {
