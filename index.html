@@ -3,168 +3,157 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>vos · El asistente que atiende tu WhatsApp</title>
-<meta name="description" content="Un asistente que atiende tu WhatsApp — y suena como vos. Para negocios argentinos, a cualquier hora.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%2326201c'/%3E%3Cpath d='M20 8c7.2 0 13 4.5 13 10.1 0 5.6-5.8 10-13 10-1.6 0-3.2-.2-4.6-.6L8 31l1.7-5.2C7.7 24.1 6 21.4 6 18.1 6 12.5 12.8 8 20 8Z' fill='%23c8993c'/%3E%3Ccircle cx='14.4' cy='18.3' r='2.1' fill='%2326201c'/%3E%3Ccircle cx='20' cy='18.3' r='2.1' fill='%2326201c'/%3E%3Ccircle cx='25.6' cy='18.3' r='2.1' fill='%2326201c'/%3E%3C/svg%3E">
+<title>vos · El asistente de WhatsApp para desarrolladoras inmobiliarias</title>
+<meta name="description" content="vos atiende WhatsApp con los datos de cada proyecto: tipologías, etapa de obra y visitas. Precalifica al interesado y le pasa la ficha a tu equipo comercial.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%2312302A'/%3E%3Ctext x='7' y='27' font-family='Arial,sans-serif' font-weight='900' font-size='20' fill='%23F6F3EC'%3Ev%3C/text%3E%3Ccircle cx='28' cy='25' r='3.4' fill='%238CCBA6'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#26201c;--gold:#c8993c;--bone:#f6f0e6;--camel:#d8b98a;--clay:#b6764a;
-    --paper:#f3ead9;--sidebar:#3a2f24;--text-dark:#26201c
+    --hondo:#12302A;--hondo2:#1B3D35;--senal:#8CCBA6;--senal-texto:#2F7556;
+    --crema:#F6F3EC;--arena:#ECE7DB;--linea:#DDD7C9;--tinta:#1C221F;--gris:#4A544F;--gris2:#5C6660;
+    --sobre-hondo:#DCE5DF;--borde-hondo:#4C6A60
   }
   *{box-sizing:border-box}
   [hidden]{display:none!important}
   html{scroll-behavior:smooth}
   html,body{margin:0}
-  body{font-family:'Hanken Grotesk',system-ui,sans-serif;color:var(--bone);-webkit-font-smoothing:antialiased;background:#1b1611}
-  h1,h2,h3,.serif{font-family:'Fraunces',Georgia,serif}
+  body{font-family:'DM Sans',system-ui,sans-serif;color:var(--tinta);background:var(--crema);-webkit-font-smoothing:antialiased}
+  h1,h2,h3,.display{font-family:'Archivo',system-ui,sans-serif}
   img,svg{max-width:100%}
   a{color:inherit}
-  .container{max-width:1080px;margin:0 auto;padding:0 26px}
+  .container{max-width:1180px;margin:0 auto;padding:0 20px}
   @media(min-width:640px){.container{padding:0 40px}}
 
+  /* ============ MARCA ============ */
+  .wm{display:inline-flex;align-items:baseline;gap:4px;text-decoration:none;color:inherit}
+  .wm b{font-family:'Archivo',sans-serif;font-weight:800;font-size:30px;letter-spacing:-.045em;line-height:1}
+  .wm i{width:9px;height:9px;border-radius:50%;background:var(--senal);display:inline-block}
+
   /* ============ HERO ============ */
-  .hero{position:relative;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 26px 80px;overflow:hidden;background:radial-gradient(120% 90% at 50% 30%,#332a22 0%,#251f1a 52%,#1b1611 100%)}
-  .glow{position:absolute;top:16%;left:50%;transform:translate(-50%,-50%);width:min(560px,120vw);height:min(560px,120vw);background:radial-gradient(circle,rgba(200,153,60,.4) 0%,rgba(200,153,60,.11) 38%,transparent 68%);filter:blur(6px);pointer-events:none;animation:glow 6s ease-in-out infinite}
-  @keyframes glow{0%,100%{opacity:.55;transform:translate(-50%,-50%) scale(1)}50%{opacity:.85;transform:translate(-50%,-50%) scale(1.08)}}
-  .icon{position:relative;z-index:1;filter:drop-shadow(0 14px 40px rgba(200,153,60,.32))}
-  .icon svg{display:block;width:clamp(64px,16vw,84px);height:auto}
-  .pdot{transform-box:fill-box;transform-origin:center;animation:vosdot 1.5s ease-in-out infinite}
-  .pdot.d2{animation-delay:.22s}.pdot.d3{animation-delay:.44s}
-  @keyframes vosdot{0%,58%,100%{opacity:.26;transform:scale(.7)}28%{opacity:1;transform:scale(1)}}
-  .kick{position:relative;z-index:1;font-weight:600;font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--camel);margin:22px 0 0}
-  .h1{position:relative;z-index:1;font-weight:500;font-size:clamp(38px,7.4vw,64px);line-height:1.04;letter-spacing:-.01em;color:var(--bone);margin:16px 0 0;max-width:15ch}
-  .h1 em{font-style:italic;color:var(--gold)}
-  .sub{position:relative;z-index:1;font-weight:400;font-size:clamp(17px,3.6vw,20px);line-height:1.55;color:var(--bone);opacity:.86;max-width:36ch;margin:20px 0 0}
-  .heroctas{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:34px 0 0}
-  .btn{height:54px;border-radius:14px;border:none;font-weight:700;font-size:16px;font-family:inherit;letter-spacing:.01em;cursor:pointer;transition:transform .15s,box-shadow .2s,background .2s;padding:0 28px;display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
-  .btn-primary{background:var(--gold);color:var(--ink);box-shadow:0 10px 30px -10px rgba(200,153,60,.6)}
-  .btn-primary:hover{background:#d6a648;transform:translateY(-1px);box-shadow:0 14px 36px -10px rgba(200,153,60,.7)}
-  .btn-ghost{background:transparent;color:var(--bone);border:1.5px solid rgba(216,185,138,.4)}
-  .btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
-  .fine{position:relative;z-index:1;font-weight:500;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--camel);margin:26px 0 0;opacity:.8}
-  .scrolldown{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);z-index:1;width:22px;height:36px;border:1.5px solid rgba(216,185,138,.5);border-radius:12px;display:flex;justify-content:center;padding-top:7px}
-  .scrolldown i{width:3px;height:7px;border-radius:2px;background:var(--gold);animation:sdown 1.6s ease-in-out infinite}
-  @keyframes sdown{0%{opacity:0;transform:translateY(0)}30%{opacity:1}100%{opacity:0;transform:translateY(9px)}}
+  .hero{background:var(--hondo);color:var(--crema)}
+  .nav{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;padding-top:20px;padding-bottom:20px}
+  .navlinks{display:flex;flex-wrap:wrap;align-items:center;gap:22px;font-size:15px}
+  .navlinks a{color:var(--sobre-hondo);text-decoration:none}
+  .navlinks a:hover{color:#fff}
+  .navlinks a.btn-crema,.navlinks a.btn-crema:hover{color:var(--hondo)}
+  .navlinks .hide-sm{display:none}
+  @media(min-width:760px){.navlinks .hide-sm{display:inline}}
+  .herogrid{display:flex;flex-wrap:wrap;gap:48px;align-items:center;padding-top:56px;padding-bottom:88px}
+  .herocopy{flex:1 1 480px;min-width:0;display:flex;flex-direction:column;gap:22px}
+  .kick{margin:0;font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--senal)}
+  .h1{margin:0;font-weight:800;font-size:clamp(38px,6.2vw,62px);line-height:1.03;letter-spacing:-.03em}
+  .sub{margin:0;font-size:clamp(17px,2.4vw,19px);line-height:1.55;color:var(--sobre-hondo);max-width:34em}
+  .heroctas{display:flex;flex-wrap:wrap;gap:12px;padding-top:6px}
+  .btn{min-height:52px;border-radius:999px;border:none;font-weight:700;font-size:16px;font-family:inherit;cursor:pointer;transition:transform .15s,background .2s,border-color .2s;padding:0 26px;display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+  .btn:hover{transform:translateY(-1px)}
+  .btn-senal{background:var(--senal);color:#0B1F1A}
+  .btn-senal:hover{background:#9ED6B5}
+  .btn-crema{background:var(--crema);color:var(--hondo);min-height:44px;padding:0 20px;font-size:15px}
+  .btn-ghost{background:transparent;color:var(--crema);border:1px solid var(--borde-hondo);font-weight:500}
+  .btn-ghost:hover{border-color:var(--senal)}
+  .btn-hondo{background:var(--hondo);color:var(--crema)}
+  .btn-linea{background:transparent;color:var(--hondo);border:1px solid var(--hondo)}
+  .fine{margin:0;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#B9C7BF}
 
-  /* ============ SECTION SHELL (dark) ============ */
-  section{padding:96px 0}
-  .eyebrow{font-weight:600;font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin:0 0 14px}
-  .stitle{font-weight:500;font-size:clamp(28px,5vw,42px);line-height:1.12;letter-spacing:-.01em;color:var(--bone);margin:0 0 16px;max-width:20ch}
-  .stitle em{font-style:italic;color:var(--gold)}
-  .sdesc{font-size:clamp(15.5px,2.4vw,17.5px);line-height:1.6;color:var(--bone);opacity:.78;max-width:52ch;margin:0}
-  .center{text-align:center;margin-left:auto;margin-right:auto}
+  /* Chat de ejemplo */
+  .herochat{flex:1 1 360px;min-width:0;display:flex;justify-content:center}
+  .chat{width:100%;max-width:400px;background:var(--crema);color:var(--tinta);border-radius:28px;padding:18px;display:flex;flex-direction:column;gap:11px}
+  .chathead{display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--linea)}
+  .chatav{width:40px;height:40px;border-radius:50%;background:var(--hondo);color:var(--crema);display:flex;align-items:center;justify-content:center;font-family:'Archivo',sans-serif;font-weight:800;font-size:16px;flex-shrink:0}
+  .chathead b{display:block;font-size:15px}
+  .chathead span{font-size:13px;color:var(--gris2)}
+  .msg{padding:11px 14px;font-size:15px;line-height:1.45;max-width:86%}
+  .msg.in{align-self:flex-end;background:#DCEBDF;border-radius:16px 16px 4px 16px;max-width:80%}
+  .msg.out{align-self:flex-start;background:#fff;border-radius:16px 16px 16px 4px}
+  .chatnote{align-self:center;font-size:12px;color:var(--gris2);background:var(--arena);padding:6px 12px;border-radius:999px}
 
-  /* ============ EXPLAINER PLACEHOLDER ============ */
-  .video-frame{position:relative;aspect-ratio:16/9;max-width:820px;margin:44px auto 0;border-radius:20px;overflow:hidden;background:linear-gradient(135deg,#332a22,#1f1a15);border:1px solid rgba(216,185,138,.22);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
-  .playbtn{width:64px;height:64px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px -8px rgba(200,153,60,.6)}
-  .playbtn svg{width:22px;height:22px;fill:var(--ink);margin-left:3px}
-  .video-frame .vlabel{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--camel);opacity:.75}
+  /* ============ SECCIONES ============ */
+  section{padding:88px 0}
+  .eyebrow{margin:0 0 12px;font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--senal-texto)}
+  .stitle{margin:0 0 16px;font-weight:800;font-size:clamp(30px,4.6vw,44px);line-height:1.08;letter-spacing:-.02em;max-width:22ch}
+  .sdesc{margin:0;font-size:clamp(16px,2.2vw,18px);line-height:1.6;color:var(--gris);max-width:44em}
+  .grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:44px}
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;margin-top:40px}
+  .card{background:#fff;border:1px solid var(--linea);border-radius:20px;padding:26px;display:flex;flex-direction:column;gap:10px}
+  .card .num{font-family:'Archivo',sans-serif;font-weight:800;font-size:15px;color:var(--senal-texto)}
+  .card h3,.rule h3{margin:0;font-size:21px;font-weight:700;line-height:1.25}
+  .card p,.rule p{margin:0;font-size:16px;line-height:1.55;color:var(--gris)}
+  .rule{border-top:3px solid var(--hondo);padding-top:18px;display:flex;flex-direction:column;gap:10px}
 
-  /* ============ FOR WHOM — 3 cards ============ */
-  .whom-grid{display:grid;grid-template-columns:1fr;gap:18px;margin-top:48px}
-  @media(min-width:760px){.whom-grid{grid-template-columns:repeat(3,1fr)}}
-  .whom-card{background:rgba(246,240,230,.04);border:1px solid rgba(216,185,138,.18);border-radius:18px;padding:30px 26px;text-align:left;position:relative;overflow:hidden}
-  .whom-card .wnum{font-family:'Fraunces',serif;font-size:13px;color:var(--gold);opacity:.7;letter-spacing:.06em;text-transform:uppercase}
-  .whom-card h3{font-size:22px;font-weight:500;color:var(--bone);margin:10px 0 8px}
-  .whom-card p{font-size:14.5px;line-height:1.55;color:var(--bone);opacity:.72;margin:0}
-  .whom-card .bubble{margin-top:16px;background:rgba(200,153,60,.1);border:1px solid rgba(200,153,60,.22);border-radius:10px;padding:10px 13px;font-size:13.5px;color:var(--gold);font-style:italic}
+  .arena{background:var(--arena)}
+  .split{display:flex;flex-wrap:wrap;gap:48px;align-items:center}
+  .split > div{flex:1 1 420px;min-width:0}
+  .channels{display:flex;flex-direction:column;gap:12px}
+  .channel{background:#fff;border-radius:16px;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .channel b{font-family:'Archivo',sans-serif;font-weight:700;font-size:20px}
+  .channel span{font-size:14px;font-weight:700;color:var(--gris2)}
+  .channel span.on{color:var(--senal-texto)}
 
-  /* ============ HOW IT WORKS — 3 steps ============ */
-  .steps{margin-top:52px;display:grid;grid-template-columns:1fr;gap:0}
-  @media(min-width:760px){.steps{grid-template-columns:repeat(3,1fr);gap:8px}}
-  .step{position:relative;padding:0 8px 8px 0;text-align:left}
-  .step .snum{font-family:'Fraunces',serif;font-style:italic;font-size:44px;color:var(--gold);opacity:.5;line-height:1;margin-bottom:14px}
-  .step h3{font-size:19px;font-weight:600;color:var(--bone);margin:0 0 8px}
-  .step p{font-size:14.5px;line-height:1.6;color:var(--bone);opacity:.72;margin:0}
+  /* ============ TU NÚMERO + MODAL ============ */
+  .coex-note{font-size:15px;line-height:1.55;color:var(--gris);margin:36px 0 0;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+  .infobtn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;border:1.5px solid var(--hondo);background:transparent;color:var(--hondo);font-family:'Archivo',sans-serif;font-weight:800;font-size:14px;line-height:1;cursor:pointer;flex-shrink:0}
+  .infobtn:hover{background:var(--hondo);color:var(--crema)}
+  .infobtn:focus-visible{outline:2px solid var(--senal-texto);outline-offset:2px}
+  .coex-fine{font-size:14px;line-height:1.5;color:var(--gris2);margin:10px 0 0}
 
-  /* ============ STORIES (paper section) ============ */
-  .stories-section{background:var(--paper);color:var(--text-dark)}
-  .stories-section .eyebrow{color:var(--clay)}
-  .stories-section .stitle{color:var(--text-dark)}
-  .stories-section .stitle em{color:var(--clay)}
-  .stories-section .sdesc{color:var(--text-dark);opacity:.68}
-  .stories-grid{display:grid;grid-template-columns:1fr;gap:20px;margin-top:48px}
-  @media(min-width:700px){.stories-grid{grid-template-columns:repeat(2,1fr)}}
-  @media(min-width:1000px){.stories-grid{grid-template-columns:repeat(3,1fr)}}
-  .story{background:#fff;border-radius:16px;padding:26px 24px;box-shadow:0 1px 2px rgba(38,32,28,.05);border:1px solid rgba(38,32,28,.06);text-align:left}
-  .story .who{display:flex;align-items:center;gap:11px;margin-bottom:16px}
-  .story .avatar{width:38px;height:38px;border-radius:50%;background:var(--clay);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;font-family:'Fraunces',serif;flex-shrink:0}
-  .story .who .name{font-weight:700;font-size:14.5px;color:var(--text-dark)}
-  .story .who .role{font-size:12.5px;color:var(--text-dark);opacity:.55}
-  .story blockquote{margin:0 0 14px;font-size:14.5px;line-height:1.6;color:var(--text-dark);opacity:.82;font-style:italic}
-  .story .lesson{font-size:13px;line-height:1.5;color:var(--clay);font-weight:600;border-top:1px solid rgba(38,32,28,.08);padding-top:13px}
+  .modal-overlay{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(11,31,26,.72);animation:rise .2s ease both}
+  .modal-card{position:relative;max-width:520px;width:100%;max-height:88vh;overflow-y:auto;background:var(--crema);color:var(--tinta);border-radius:22px;padding:36px 28px 30px;text-align:left;box-shadow:0 30px 80px -20px rgba(0,0,0,.5)}
+  .modal-card h3{font-weight:800;font-size:24px;margin:0 0 14px}
+  .modal-card p{font-size:15px;line-height:1.6;color:var(--gris);margin:0 0 14px}
+  .modal-card ul{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:10px}
+  .modal-card li{position:relative;padding-left:18px;font-size:14.5px;line-height:1.55;color:var(--tinta)}
+  .modal-card li::before{content:"";position:absolute;left:2px;top:9px;width:6px;height:6px;border-radius:50%;background:var(--senal-texto)}
+  .modal-card b{font-weight:700;color:var(--tinta)}
+  .modal-card .modal-cond{border-top:1px solid var(--linea);padding-top:16px}
+  .modal-card .modal-foot{font-size:14px;margin-bottom:0}
+  .modal-close{position:absolute;top:10px;right:12px;width:44px;height:44px;border:none;background:transparent;color:var(--gris);font-size:28px;line-height:1;cursor:pointer;border-radius:10px}
+  .modal-close:hover{background:var(--arena);color:var(--tinta)}
+  .modal-close:focus-visible{outline:2px solid var(--senal-texto);outline-offset:2px}
 
-  /* ============ TRUST / VOS NO TE POSEE ============ */
-  .trust{background:radial-gradient(120% 90% at 50% 30%,#332a22 0%,#251f1a 52%,#1b1611 100%)}
-  .trust-grid{display:grid;grid-template-columns:1fr;gap:16px;margin-top:48px}
-  @media(min-width:760px){.trust-grid{grid-template-columns:repeat(3,1fr)}}
-  .trust-item{text-align:left;padding:26px 4px}
-  .trust-item .ticon{width:38px;height:38px;margin-bottom:16px}
-  .trust-item .ticon svg{width:100%;height:100%}
-  .trust-item h3{font-size:18px;font-weight:600;color:var(--bone);margin:0 0 8px}
-  .trust-item p{font-size:14px;line-height:1.6;color:var(--bone);opacity:.7;margin:0}
+  /* ============ PRECIO ============ */
+  .price-card{max-width:520px;margin:40px 0 0;background:#fff;border:1px solid var(--linea);border-radius:22px;padding:34px 30px}
+  .price-card .pname{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--senal-texto);font-weight:700}
+  .price-card .pbody{font-size:16px;line-height:1.55;color:var(--gris);margin:16px 0 0}
+  .price-card .pbody strong{color:var(--tinta);font-weight:700}
+  .plist{list-style:none;margin:24px 0 0;padding:0;display:flex;flex-direction:column;gap:11px}
+  .plist li{font-size:15.5px;color:var(--tinta);display:flex;gap:10px;align-items:flex-start;line-height:1.45}
+  .plist svg{width:18px;height:18px;flex-shrink:0;margin-top:2px;fill:var(--senal-texto)}
+  .price-card .btn{width:100%;margin-top:28px}
 
-  /* ============ PRICE ============ */
-  .price-card{max-width:400px;margin:48px auto 0;background:rgba(246,240,230,.05);border:1.5px solid var(--gold);border-radius:22px;padding:44px 34px;text-align:center}
-  .price-card .pname{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--camel);font-weight:600}
-  .price-card .plist{list-style:none;margin:28px 0 0;padding:0;text-align:left;display:flex;flex-direction:column;gap:12px}
-  .price-card .plist li{font-size:14.5px;color:var(--bone);opacity:.85;display:flex;gap:10px;align-items:flex-start}
-  .price-card .plist svg{width:17px;height:17px;flex-shrink:0;margin-top:2px;fill:var(--gold)}
-  .price-card .btn{width:100%;margin-top:30px}
-  .price-note{text-align:center;font-size:13px;color:var(--camel);opacity:.75;margin:18px 0 0}
+  /* ============ OTROS SECTORES ============ */
+  .band{background:#fff;border:1px solid var(--linea);border-radius:24px;padding:34px;display:flex;flex-wrap:wrap;gap:22px;align-items:center;justify-content:space-between}
+  .band div{flex:1 1 480px;min-width:0}
+  .band h2{margin:0 0 8px;font-weight:700;font-size:26px;line-height:1.2}
+  .band p{margin:0;font-size:16px;line-height:1.55;color:var(--gris)}
 
-  /* ============ FINAL CTA / FORM ============ */
-  .cta-section{background:#161210;text-align:center}
-  .formzone{width:100%;max-width:440px;margin:38px auto 0}
+  /* ============ CTA / FORM ============ */
+  .cta-section{background:var(--hondo);color:var(--crema)}
+  .cta-section .eyebrow{color:var(--senal)}
+  .cta-section .stitle{color:var(--crema)}
+  .cta-section .sdesc{color:var(--sobre-hondo)}
+  .formzone{width:100%;max-width:460px;margin:34px 0 0}
   .form{display:flex;flex-direction:column;gap:11px}
-  .field{width:100%;height:54px;border-radius:14px;border:1.5px solid rgba(216,185,138,.35);background:rgba(246,240,230,.05);color:var(--bone);font-weight:500;font-size:16px;font-family:inherit;padding:0 18px;outline:none;transition:border-color .2s,background .2s}
-  .field::placeholder{color:rgba(216,185,138,.55)}
-  .field:focus{border-color:var(--gold);background:rgba(246,240,230,.08)}
+  .field{width:100%;min-height:52px;border-radius:14px;border:1px solid var(--borde-hondo);background:var(--hondo2);color:var(--crema);font-weight:500;font-size:16px;font-family:inherit;padding:0 18px;outline:none;transition:border-color .2s}
+  .field::placeholder{color:#A9BBB2}
+  .field:focus{border-color:var(--senal)}
   .form .btn{width:100%}
   /* Honeypot: fuera de la vista de todos, sin ocupar lugar y sin animarse.
      No se usa [hidden] ni display:none porque hay bots que saltean justo eso. */
   .hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
-  .phonehint{font-size:12.5px;color:var(--camel);opacity:.7;text-align:left;margin:-2px 2px 0}
-  .done{display:flex;flex-direction:column;align-items:center;gap:8px;padding:26px 22px;border-radius:16px;background:rgba(200,153,60,.1);border:1px solid rgba(200,153,60,.28);animation:rise .5s ease both}
+  .phonehint{font-size:13.5px;color:#B9C7BF;margin:-2px 2px 0}
+  .done{display:flex;flex-direction:column;gap:8px;padding:24px 22px;border-radius:16px;background:var(--hondo2);border:1px solid var(--borde-hondo);animation:rise .5s ease both}
   @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-  .donetitle{font-weight:700;font-size:20px;line-height:1.2;color:var(--gold)}
-  .donesub{font-weight:400;font-size:14.5px;line-height:1.5;color:var(--bone);opacity:.85;max-width:32ch}
-  .err{margin-top:11px;font-weight:500;font-size:13.5px;line-height:1.4;color:#e0a86a;animation:rise .4s ease both}
+  .donetitle{font-family:'Archivo',sans-serif;font-weight:800;font-size:21px;line-height:1.2;color:var(--senal)}
+  .donesub{font-size:15px;line-height:1.5;color:var(--sobre-hondo)}
+  .err{margin-top:11px;font-weight:500;font-size:14px;line-height:1.4;color:#F2B999;animation:rise .4s ease both}
 
-  /* ============ TU NÚMERO — nota + botón info ============ */
-  .coex-note{font-size:15px;line-height:1.55;color:var(--bone);opacity:.82;margin:44px 0 0;display:flex;gap:9px;align-items:center;justify-content:center;flex-wrap:wrap}
-  .infobtn{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--gold);background:transparent;color:var(--gold);font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:13px;line-height:1;cursor:pointer;transition:background .2s,color .2s;flex-shrink:0}
-  .infobtn:hover{background:var(--gold);color:var(--ink)}
-  .infobtn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-  .coex-fine{font-size:13px;line-height:1.5;color:var(--camel);opacity:.8;margin:14px 0 0}
-
-  /* ============ PRICE — cuerpo del card (sin números: el precio se fija con el piloto) ============ */
-  .price-card .pbody{font-size:15px;line-height:1.55;color:var(--bone);margin:18px 0 0;text-align:left}
-  .price-card .pbody strong{color:var(--gold);font-weight:700}
-
-  /* ============ MODAL ============ */
-  .modal-overlay{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(15,12,10,.74);animation:rise .2s ease both}
-  .modal-card{position:relative;max-width:520px;width:100%;max-height:88vh;overflow-y:auto;background:radial-gradient(120% 90% at 50% 0%,#332a22 0%,#251f1a 58%,#1f1a15 100%);border:1.5px solid var(--gold);border-radius:22px;padding:38px 30px 32px;text-align:left;box-shadow:0 30px 80px -20px rgba(0,0,0,.7)}
-  .modal-card h3{font-family:'Fraunces',serif;font-weight:500;font-size:24px;color:var(--bone);margin:0 0 14px}
-  .modal-card p{font-size:14.5px;line-height:1.6;color:rgba(246,240,230,.82);margin:0 0 14px}
-  .modal-card ul{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:11px}
-  .modal-card li{position:relative;padding-left:20px;font-size:14px;line-height:1.55;color:rgba(246,240,230,.86)}
-  .modal-card li::before{content:"·";position:absolute;left:5px;top:-3px;color:var(--gold);font-weight:700;font-size:20px;line-height:1}
-  .modal-card b{color:var(--bone);font-weight:700}
-  .modal-card .modal-cond{border-top:1px solid rgba(216,185,138,.2);padding-top:16px}
-  .modal-card .modal-foot{color:var(--camel);font-size:13.5px;margin-bottom:0}
-  .modal-close{position:absolute;top:12px;right:14px;width:34px;height:34px;border:none;background:transparent;color:var(--camel);font-size:26px;line-height:1;cursor:pointer;border-radius:8px;transition:color .2s,background .2s}
-  .modal-close:hover{color:var(--bone);background:rgba(246,240,230,.06)}
-  .modal-close:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-
-  /* ============ FOOT ============ */
-  .foot{padding:36px 0 44px;text-align:center;font-weight:600;font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);opacity:.6;background:#161210}
-  .foot a{color:inherit;text-decoration:none}
+  /* ============ PIE ============ */
+  .foot{padding:28px 0 36px;font-size:14px;line-height:1.6;color:#B9C7BF;background:var(--hondo);border-top:1px solid #2A4A42}
+  .foot a{color:var(--sobre-hondo);text-decoration:none}
   .foot a:hover{text-decoration:underline}
-  .foot-line{margin:0 0 10px}
+  .foot-line{margin:0 0 6px}
   .foot-line:last-child{margin-bottom:0}
 </style>
 </head>
@@ -172,246 +161,181 @@
 
 <!-- ============ HERO ============ -->
 <header class="hero">
-  <div class="glow"></div>
-  <div class="icon">
-    <svg viewBox="0 0 40 40" role="img" aria-label="vos">
-      <path d="M20 6.5c8.4 0 15.2 5.3 15.2 11.9 0 6.5-6.8 11.8-15.2 11.8-1.9 0-3.7-.27-5.4-.75L7 34l2-6.1C6.7 25.6 4.8 22.3 4.8 18.4 4.8 11.8 11.6 6.5 20 6.5Z" fill="#c8993c"/>
-      <circle class="pdot" cx="13.6" cy="18.6" r="2.5" fill="#26201c"/>
-      <circle class="pdot d2" cx="20" cy="18.6" r="2.5" fill="#26201c"/>
-      <circle class="pdot d3" cx="26.4" cy="18.6" r="2.5" fill="#26201c"/>
-    </svg>
+  <nav class="container nav" aria-label="Principal">
+    <a class="wm" href="/" aria-label="vos, inicio"><b>vos</b><i aria-hidden="true"></i></a>
+    <div class="navlinks">
+      <a class="hide-sm" href="#como-funciona">Cómo funciona</a>
+      <a class="hide-sm" href="#canales">Canales</a>
+      <a class="hide-sm" href="#cuidado">Cumplimiento</a>
+      <a class="btn btn-crema" href="#anotarme">Pedir una demo</a>
+    </div>
+  </nav>
+  <div class="container herogrid">
+    <div class="herocopy">
+      <p class="kick">Para desarrolladoras inmobiliarias</p>
+      <h1 class="h1">Tus interesados preguntan a toda hora. vos responde con los datos de cada proyecto.</h1>
+      <p class="sub">Un asistente que atiende tu WhatsApp: conoce cada edificio, tipología y etapa de obra, precalifica al interesado y le pasa el pedido de visita a tu equipo.</p>
+      <div class="heroctas">
+        <a class="btn btn-senal" href="#anotarme">Pedir una demo</a>
+        <a class="btn btn-ghost" href="#como-funciona">Ver cómo funciona</a>
+      </div>
+      <p class="fine">Tu número · Tus datos · Tu última palabra</p>
+    </div>
+    <div class="herochat">
+      <div class="chat" role="img" aria-label="Ejemplo de conversación de WhatsApp entre un interesado y vos">
+        <div class="chathead">
+          <div class="chatav" aria-hidden="true">v</div>
+          <div><b>Tu desarrolladora</b><span>Atiende vos · WhatsApp</span></div>
+        </div>
+        <div class="msg in">Hola, ¿quedan 2 ambientes en el edificio 3? ¿Puedo ir a ver la obra?</div>
+        <div class="msg out">¡Hola! En el Edificio 3 hay unidades de 2 ambientes en planos. La obra está en estructura. ¿Lo buscás para vivir o para invertir?</div>
+        <div class="msg in">Para vivir. El sábado a la mañana me queda bien.</div>
+        <div class="msg out">Perfecto. Le paso tu pedido de visita del sábado a la mañana al equipo comercial y te confirman por acá.</div>
+        <div class="chatnote">Ficha enviada al equipo · visita a obra</div>
+      </div>
+    </div>
   </div>
-  <div class="kick">Para negocios argentinos</div>
-  <h1 class="h1">El asistente que atiende tu WhatsApp — y suena <em>como vos</em>.</h1>
-  <p class="sub">Mientras trabajás, VOS responde. En tu voz, a cualquier hora. Vos te metés cuando querés.</p>
-  <div class="heroctas">
-    <a class="btn btn-primary" href="#anotarme">Quiero que me avisen</a>
-    <a class="btn btn-ghost" href="#como-funciona">Ver cómo funciona</a>
-  </div>
-  <div class="fine">Tu número · Tus datos · Tu última palabra</div>
-  <div class="scrolldown"><i></i></div>
 </header>
-
-<!-- ============ VIDEO EXPLAINER ============ -->
-<section id="video">
-  <div class="container center">
-    <div class="eyebrow">Así funciona</div>
-    <h2 class="stitle center">El problema que ya conocés</h2>
-    <p class="sdesc center">No hace falta explicarlo mucho. Ya lo viviste.</p>
-    <div class="video-frame" style="background:#000;">
-      <video controls preload="metadata" poster="videos/vos-poster.png" style="width:100%;height:100%;border-radius:20px;object-fit:cover;">
-        <source src="videos/vos-explainer.mp4" type="video/mp4">
-      </video>
-    </div>
-  </div>
-</section>
-
-<!-- ============ PARA QUIÉN ES ============ -->
-<section id="para-quien">
-  <div class="container center">
-    <div class="eyebrow">Para quién es VOS</div>
-    <h2 class="stitle center">No sos una empresa grande. <em>Por eso lo hicimos así.</em></h2>
-    <p class="sdesc center">VOS es para el que atiende el negocio solo — o casi solo. El gasista, la panadera, el que muestra propiedades. Si tenés las manos ocupadas y el teléfono sonando, esto es para vos.</p>
-    <div class="whom-grid">
-      <div class="whom-card">
-        <div class="wnum">Gasista</div>
-        <h3>Manos ocupadas</h3>
-        <p>Estás bajo una pileta o arriba de un techo. No podés mirar el teléfono cada dos minutos, pero el cliente no lo sabe — y se cansa de esperar.</p>
-        <div class="bubble">"¿Tenés turno para hoy? Se me rompió todo"</div>
-      </div>
-      <div class="whom-card">
-        <div class="wnum">Panadería</div>
-        <h3>Mostrador lleno</h3>
-        <p>Hay fila hasta la puerta y el teléfono no para de sonar. No podés estar en dos lugares — y algo se pierde: la venta, o el cliente.</p>
-        <div class="bubble">"¿Hacen tortas de cumpleaños?"</div>
-      </div>
-      <div class="whom-card">
-        <div class="wnum">Inmobiliaria</div>
-        <h3>Siempre en la calle</h3>
-        <p>Estás mostrando una propiedad cuando llega el mensaje que importa. El que contesta primero, gana el cliente. Vos estabas ocupado ganándote el pan.</p>
-        <div class="bubble">"¿Sigue disponible el depto de 2 ambientes?"</div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- ============ CÓMO FUNCIONA ============ -->
 <section id="como-funciona">
-  <div class="container center">
-    <div class="eyebrow">Cómo funciona</div>
-    <h2 class="stitle center">Tres pasos. Nada más.</h2>
-    <p class="sdesc center">Sin instalar nada raro, sin curva de aprendizaje. Si sabés usar WhatsApp, ya sabés usar VOS.</p>
-    <div class="steps">
-      <div class="step">
-        <div class="snum">Uno</div>
-        <h3>Te escriben</h3>
-        <p>Un cliente te manda un mensaje. VOS lo lee, entiende qué necesita, y prepara una respuesta en el tono de tu negocio.</p>
+  <div class="container">
+    <p class="eyebrow">Qué hace vos</p>
+    <h2 class="stitle">Del primer mensaje a la visita, sin que nadie quede esperando.</h2>
+    <div class="grid4">
+      <div class="card">
+        <span class="num">01</span>
+        <h3>Conoce cada proyecto</h3>
+        <p>Edificios, tipologías, amenities y etapa de obra. Si tenés varios proyectos, entiende de cuál te están hablando.</p>
       </div>
-      <div class="step">
-        <div class="snum">Dos</div>
-        <h3>VOS responde</h3>
-        <p>La respuesta sale al toque, en tu voz — no genérica, no robótica. Como si la hubieras escrito vos mismo.</p>
+      <div class="card">
+        <span class="num">02</span>
+        <h3>Precalifica</h3>
+        <p>Para vivir o para invertir, cuántos ambientes, en qué plazo. Pregunta lo justo, en el tono de tu marca.</p>
       </div>
-      <div class="step">
-        <div class="snum">Tres</div>
-        <h3>Vos tenés la última palabra</h3>
-        <p>Todo pasa en tu WhatsApp de siempre — lo ves en vivo. Si querés meterte, escribí nomás: VOS se hace a un lado y te deja seguir a vos. Cuando quieras que vuelva, se lo pedís.</p>
+      <div class="card">
+        <span class="num">03</span>
+        <h3>Toma el pedido de visita</h3>
+        <p>A obra o al showroom, con día y franja horaria. La confirma tu equipo: vos no promete lo que no puede cumplir.</p>
+      </div>
+      <div class="card">
+        <span class="num">04</span>
+        <h3>Avisa a tu equipo</h3>
+        <p>La ficha del interesado llega por WhatsApp y por email a la persona que elijas, proyecto por proyecto.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CANALES ============ -->
+<section class="arena" id="canales">
+  <div class="container split">
+    <div>
+      <p class="eyebrow">Un cerebro, tres canales</p>
+      <h2 class="stitle">Cargás el proyecto una vez. Responde igual en todos lados.</h2>
+      <p class="sdesc">Tipologías, etapas y textos aprobados viven en un solo lugar. Cuando algo cambia, cambia para todos los canales a la vez. Y si operás en más de un país, cada uno puede tener su propio número.</p>
+    </div>
+    <div class="channels">
+      <div class="channel"><b>WhatsApp</b><span class="on">Activo</span></div>
+      <div class="channel"><b>Instagram</b><span>Próximamente</span></div>
+      <div class="channel"><b>Chat en tu web</b><span>Próximamente</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CUMPLIMIENTO ============ -->
+<section id="cuidado">
+  <div class="container">
+    <p class="eyebrow">Cuida lo que no se puede prometer</p>
+    <h2 class="stitle">Vender en pozo tiene reglas. vos las respeta.</h2>
+    <div class="grid3">
+      <div class="rule">
+        <h3>No promete rentabilidad</h3>
+        <p>Ni retornos, ni revalorización, ni "es una buena inversión". Si el interesado insiste, lo deriva a tu equipo.</p>
+      </div>
+      <div class="rule">
+        <h3>Respeta la etapa de cada proyecto</h3>
+        <p>Informativo, oferta en preparación o venta de unidades: lo que puede decir cambia según la etapa que marques.</p>
+      </div>
+      <div class="rule">
+        <h3>Textos que aprueba tu equipo</h3>
+        <p>Las frases sensibles salen de un texto aprobado por tu desarrolladora, no de la improvisación del modelo.</p>
       </div>
     </div>
   </div>
 </section>
 
 <!-- ============ TU NÚMERO, TU WHATSAPP ============ -->
-<section id="tu-numero">
-  <div class="container center">
-    <div class="eyebrow">Tu número, tu WhatsApp</div>
-    <h2 class="stitle center">No cambiás nada. <em>Solo dejás de perder clientes.</em></h2>
-    <p class="sdesc center">Seguís usando tu WhatsApp Business de siempre, en tu celular, con tu número de siempre y todos tus chats. No hay número nuevo, no hay que avisarle a nadie, no perdés tu historial. VOS contesta por vos cuando no llegás — y vos ves todo en tu teléfono, como siempre.</p>
-    <div class="trust-grid">
-      <div class="trust-item">
-        <h3>Tu número de siempre</h3>
-        <p>El que está en tu camioneta, en tus tarjetas, el que tus clientes ya tienen guardado. Ese mismo.</p>
+<section class="arena" id="tu-numero">
+  <div class="container">
+    <p class="eyebrow">Tu número, tu WhatsApp</p>
+    <h2 class="stitle">No cambiás nada. Solo dejás de perder interesados.</h2>
+    <p class="sdesc">Tu equipo sigue usando el WhatsApp Business de siempre, con el número que ya está en tus carteles y tus redes, y con todo el historial. vos contesta cuando nadie llega, y ustedes ven cada conversación en el teléfono.</p>
+    <div class="grid3">
+      <div class="rule">
+        <h3>El número de siempre</h3>
+        <p>El que está en el cartel de obra y en tus avisos. Ese mismo.</p>
       </div>
-      <div class="trust-item">
-        <h3>Tu WhatsApp de siempre</h3>
-        <p>Seguís abriendo la misma app. Ves las conversaciones, ves lo que VOS contestó, y contestás vos cuando querés.</p>
+      <div class="rule">
+        <h3>La app de siempre</h3>
+        <p>Ves las conversaciones, ves lo que respondió vos y contestás cuando querés.</p>
       </div>
-      <div class="trust-item">
-        <h3>Vos mandás, siempre</h3>
-        <p>Si escribís, VOS se hace a un lado y te deja seguir. Cuando quieras que vuelva, se lo pedís.</p>
-      </div>
-    </div>
-    <p class="coex-note center">Algunas funciones de WhatsApp cambian al conectar. <button type="button" class="infobtn" id="coexInfoBtn" aria-haspopup="dialog" aria-controls="coexModal" aria-label="Ver qué cambia en tu WhatsApp">i</button></p>
-    <p class="coex-fine center">Solo necesitás abrir tu WhatsApp cada tanto — como hacés todos los días igual.</p>
-  </div>
-</section>
-
-<!-- ============ HISTORIAS REALES ============ -->
-<section class="stories-section" id="historias">
-  <div class="container center">
-    <div class="eyebrow">Historias reales</div>
-    <h2 class="stitle center">A todos nos pasó. <em>Perder algo por no llegar a tiempo.</em></h2>
-    <p class="sdesc center">No son casos hipotéticos. Es lo que le pasa todos los días a alguien que labura solo.</p>
-    <div class="stories-grid">
-
-      <div class="story">
-        <div class="who">
-          <div class="avatar">M</div>
-          <div><div class="name">Marcelo</div><div class="role">Gasista matriculado, Moreno</div></div>
-        </div>
-        <blockquote>"Estaba agachado en una instalación cuando me escribieron. Recién vi el mensaje esa noche. El cliente ya había llamado a otro gasista."</blockquote>
-        <div class="lesson">Perdió un trabajo de $80.000 por no mirar el teléfono a tiempo.</div>
-      </div>
-
-      <div class="story">
-        <div class="who">
-          <div class="avatar">R</div>
-          <div><div class="name">Rosana</div><div class="role">Panadería, San Isidro</div></div>
-        </div>
-        <blockquote>"Un sábado con la fila hasta la puerta, tres clientas preguntando por WhatsApp si quedaban tortas. No llegué a contestar hasta el lunes."</blockquote>
-        <div class="lesson">Las tres compraron en otro lado. No por el producto — por la espera.</div>
-      </div>
-
-      <div class="story">
-        <div class="who">
-          <div class="avatar">F</div>
-          <div><div class="name">Fede</div><div class="role">Corredor inmobiliario, Vicente López</div></div>
-        </div>
-        <blockquote>"Estaba mostrando otra propiedad cuando me escribieron por el depto que más les había gustado. Contesté al día siguiente."</blockquote>
-        <div class="lesson">Ya habían alquilado con un corredor que respondió en 20 minutos.</div>
-      </div>
-
-      <div class="story">
-        <div class="who">
-          <div class="avatar">S</div>
-          <div><div class="name">Sole</div><div class="role">Peluquería, Quilmes</div></div>
-        </div>
-        <blockquote>"Tenía las manos en un color cuando me llegaron dos consultas por turno. Las leí recién a la noche, ya no tenía sentido responder."</blockquote>
-        <div class="lesson">Dos turnos que nunca se agendaron — y nunca sabés cuántos más.</div>
-      </div>
-
-      <div class="story">
-        <div class="who">
-          <div class="avatar">D</div>
-          <div><div class="name">Diego</div><div class="role">Cerrajero, La Matanza</div></div>
-        </div>
-        <blockquote>"A las 2 de la mañana alguien queda afuera de su casa y escribe a varios cerrajeros a la vez. El que contesta primero, se queda con el trabajo."</blockquote>
-        <div class="lesson">Sin alguien atento las 24 horas, esos trabajos de urgencia se van solos.</div>
-      </div>
-
-      <div class="story">
-        <div class="who">
-          <div class="avatar">V</div>
-          <div><div class="name">Vero</div><div class="role">Veterinaria de barrio, Morón</div></div>
-        </div>
-        <blockquote>"Entre atender a los pacientes que ya estaban en la sala, no daba abasto con las consultas por WhatsApp de gente nueva."</blockquote>
-        <div class="lesson">El cliente de toda la vida espera. El nuevo, no siempre.</div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ============ VOS NO TE POSEE ============ -->
-<section class="trust" id="confianza">
-  <div class="container center">
-    <div class="eyebrow">Nuestra postura</div>
-    <h2 class="stitle center">VOS no te posee.</h2>
-    <p class="sdesc center">El número es tuyo. Las conversaciones son tuyas. Los datos son tuyos. Si en algún momento te vas, te los llevás — todos.</p>
-    <div class="trust-grid">
-      <div class="trust-item">
-        <div class="ticon"><svg viewBox="0 0 24 24" fill="none" stroke="#c8993c" stroke-width="1.6"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/></svg></div>
-        <h3>Seguro de verdad</h3>
-        <p>Tus conversaciones y tu información están protegidas. Nadie más las ve — ni siquiera nosotros las usamos para otra cosa que atenderte a vos.</p>
-      </div>
-      <div class="trust-item">
-        <div class="ticon"><svg viewBox="0 0 24 24" fill="none" stroke="#c8993c" stroke-width="1.6"><path d="M4 4v16h16"/><path d="M4 16l5-5 4 4 7-7"/></svg></div>
-        <h3>Siempre disponible</h3>
-        <p>VOS no se toma franco, no se enferma, no se olvida de contestar. Está prendido todos los días, a toda hora.</p>
-      </div>
-      <div class="trust-item">
-        <div class="ticon"><svg viewBox="0 0 24 24" fill="none" stroke="#c8993c" stroke-width="1.6"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-        <h3>Es tuyo, siempre</h3>
-        <p>Tu número de WhatsApp Business. Tus clientes. Tu historial completo. Si te vas de VOS, no perdés nada de eso.</p>
+      <div class="rule">
+        <h3>Tu equipo manda</h3>
+        <p>Si alguien de tu equipo escribe, vos se hace a un lado. Cuando quieran que vuelva, se lo piden.</p>
       </div>
     </div>
+    <p class="coex-note">Algunas funciones de WhatsApp cambian al conectar. <button type="button" class="infobtn" id="coexInfoBtn" aria-haspopup="dialog" aria-controls="coexModal" aria-label="Ver qué cambia en tu WhatsApp">i</button></p>
+    <p class="coex-fine">Solo hace falta abrir el WhatsApp Business cada tanto, como ya hacen todos los días.</p>
   </div>
 </section>
 
 <!-- ============ PRECIO ============ -->
 <section id="precio">
-  <div class="container center">
-    <div class="eyebrow">Precio</div>
-    <h2 class="stitle center">Pagás por lo que usás.</h2>
-    <p class="sdesc center">Estamos arrancando con los primeros negocios, y el precio final lo vamos a fijar con lo que aprendamos ahí — no antes. Lo que sí está decidido es cómo funciona:</p>
+  <div class="container">
+    <p class="eyebrow">Precio</p>
+    <h2 class="stitle">Pagás por lo que usás.</h2>
+    <p class="sdesc">Estamos arrancando con las primeras desarrolladoras, y el precio final lo fijamos con lo que aprendamos ahí, no antes. Lo que ya está decidido es cómo funciona:</p>
     <div class="price-card">
-      <div class="pname">Plan VOS</div>
+      <div class="pname">Plan vos</div>
       <p class="pbody"><strong>Se cobra por uso.</strong> Sin contratos largos ni permanencia: cancelás cuando quieras.</p>
-      <p class="pbody"><strong>Las horas que atendés vos, desde tu celular, no cuestan nada.</strong> Cuánto delegás lo decidís vos — VOS cubre lo que vos no llegás a atender.</p>
-      <p class="pbody"><strong>El precio lo ves antes de pagar un peso.</strong> Cuando te toque abrir tu cuenta, el número va a estar clarito adelante tuyo. Anotarte hoy no te compromete a nada.</p>
+      <p class="pbody"><strong>Lo que atiende tu equipo desde el celular no cuesta nada.</strong> vos cubre lo que ustedes no llegan a atender.</p>
+      <p class="pbody"><strong>El precio lo ves antes de pagar un peso.</strong> Pedir una demo no te compromete a nada.</p>
       <ul class="plist">
-        <li><svg viewBox="0 0 20 20"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Tu número de siempre, tu WhatsApp de siempre</li>
-        <li><svg viewBox="0 0 20 20"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Respuestas en la voz de tu negocio</li>
-        <li><svg viewBox="0 0 20 20"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Vos te metés cuando querés — VOS se hace a un lado</li>
-        <li><svg viewBox="0 0 20 20"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Modo vacaciones cuando no estás</li>
-        <li><svg viewBox="0 0 20 20"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Tus datos, siempre tuyos</li>
+        <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Todos tus proyectos en un mismo asistente</li>
+        <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Fichas de interesados por WhatsApp y email</li>
+        <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Tu número de siempre, tu WhatsApp de siempre</li>
+        <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Textos sensibles aprobados por tu equipo</li>
+        <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Tus datos, siempre tuyos</li>
       </ul>
-      <a class="btn btn-primary" href="#anotarme">Quiero que me avisen</a>
+      <a class="btn btn-hondo" href="#anotarme">Pedir una demo</a>
     </div>
-    <p class="price-note">Anotarte no cuesta nada y te avisamos primero.</p>
+  </div>
+</section>
+
+<!-- ============ OTROS SECTORES ============ -->
+<section style="padding-top:0">
+  <div class="container">
+    <div class="band">
+      <div>
+        <h2>Hecho para el desarrollo inmobiliario. Entrenable para tu sector.</h2>
+        <p>vos nació para atender interesados en proyectos. Si tu negocio es otro, lo entrenamos con tus datos y tus reglas.</p>
+      </div>
+      <a class="btn btn-linea" href="#anotarme">Contanos tu caso</a>
+    </div>
   </div>
 </section>
 
 <!-- ============ CTA FINAL / FORM ============ -->
 <section class="cta-section" id="anotarme">
-  <div class="container center">
-    <div class="eyebrow">Últimos pasos de Meta</div>
-    <h2 class="stitle center">Estamos por abrir.</h2>
-    <p class="sdesc center">Dejanos tu contacto y te avisamos apenas VOS esté listo para tu negocio. Si preferís, un integrante de nuestro equipo te puede llamar y explicarte todo sin vueltas.</p>
+  <div class="container">
+    <p class="eyebrow">Demo con tu proyecto</p>
+    <h2 class="stitle">Que ningún interesado se quede sin respuesta.</h2>
+    <p class="sdesc">Dejanos tu contacto y te mostramos vos funcionando con uno de tus proyectos. Si preferís, alguien del equipo te llama y te lo explica sin vueltas.</p>
     <div class="formzone">
       <form class="form" id="waitlist" novalidate>
-        <input class="field" id="email" type="email" placeholder="Tu email" autocomplete="email" required>
-        <input class="field" id="phone" type="tel" placeholder="Tu WhatsApp (opcional)" autocomplete="tel">
+        <input class="field" id="email" type="email" placeholder="Tu email" aria-label="Tu email" autocomplete="email" required>
+        <input class="field" id="phone" type="tel" placeholder="Tu WhatsApp (opcional)" aria-label="Tu WhatsApp (opcional)" autocomplete="tel">
         <!-- Honeypot. Invisible, fuera del orden de tabulacion y fuera del arbol
              de accesibilidad: ninguna persona lo ve ni lo puede completar. Si
              llega con algo, lo lleno un bot y el alta se descarta en el servidor.
@@ -422,12 +346,12 @@
           <input id="vos-hp" name="vos-hp" type="text" tabindex="-1" autocomplete="off">
         </div>
         <div class="phonehint">Dejanos tu número si preferís que te llamemos en vez de escribirte.</div>
-        <button class="btn btn-primary" id="submit" type="submit">Avisame</button>
+        <button class="btn btn-senal" id="submit" type="submit">Pedir una demo</button>
       </form>
       <div class="err" id="err" hidden>Uy, algo falló. Probá de nuevo.</div>
       <div class="done" id="done" hidden>
-        <div class="donetitle">Listo. Te avisamos primero.</div>
-        <div class="donesub">Gracias por sumarte. Nos vemos muy pronto.</div>
+        <div class="donetitle">Listo. Te escribimos pronto.</div>
+        <div class="donesub">Gracias. Coordinamos la demo con uno de tus proyectos.</div>
       </div>
     </div>
   </div>
@@ -438,25 +362,27 @@
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="coexModalTitle">
     <button type="button" class="modal-close" id="coexModalClose" aria-label="Cerrar">&times;</button>
     <h3 id="coexModalTitle">Qué cambia en tu WhatsApp</h3>
-    <p>Al conectar VOS, algunas funciones de WhatsApp Business dejan de estar disponibles. La mayoría de los negocios no las usa, pero preferimos que lo sepas antes:</p>
+    <p>Al conectar vos, algunas funciones de WhatsApp Business dejan de estar disponibles. La mayoría de los negocios no las usa, pero preferimos que lo sepas antes:</p>
     <ul>
       <li><b>Listas de difusión:</b> se desactivan (las que tengas quedan como solo lectura).</li>
       <li><b>Ubicación en vivo:</b> no funciona.</li>
       <li><b>Editar o borrar mensajes enviados:</b> no disponible.</li>
       <li><b>Foto de perfil:</b> no se puede cambiar después de conectar (dejala como querés antes).</li>
-      <li><b>Grupos y llamadas:</b> siguen funcionando normal en tu app, pero VOS no participa.</li>
+      <li><b>Grupos y llamadas:</b> siguen funcionando normal en tu app, pero vos no participa.</li>
       <li><b>WhatsApp para Windows:</b> no compatible.</li>
     </ul>
-    <p class="modal-cond"><b>Y una condición importante:</b><br>Tenés que abrir tu WhatsApp Business al menos una vez cada 13 días. Si no, WhatsApp desconecta VOS automáticamente. Es una regla de WhatsApp, no nuestra.</p>
+    <p class="modal-cond"><b>Y una condición importante:</b><br>Tenés que abrir tu WhatsApp Business al menos una vez cada 13 días. Si no, WhatsApp desconecta vos automáticamente. Es una regla de WhatsApp, no nuestra.</p>
     <p class="modal-foot">¿Dudas? Escribinos antes de conectar y te lo explicamos sin vueltas.</p>
   </div>
 </div>
 
-<div class="foot">
-  <div class="foot-line"><a href="https://wa.me/5491176539950">WhatsApp +54 9 11 7653-9950</a> · <a href="mailto:contact@actavia.tech">contact@actavia.tech</a></div>
-  <div class="foot-line">Proveedor de tecnología verificado de WhatsApp Business Platform</div>
-  <div class="foot-line">vos.chat · Virtual Operation System · <a href="https://actavia.tech" rel="noopener">Actavia LLC</a> · <a href="https://bloqueraiz.com" rel="noopener">BloqueRaíz</a> · <a href="privacidad.html">Privacidad</a> · <a href="terminos.html">Términos</a></div>
-</div>
+<footer class="foot">
+  <div class="container">
+    <div class="foot-line"><a href="https://wa.me/5491176539950">WhatsApp +54 9 11 7653-9950</a> · <a href="mailto:contact@actavia.tech">contact@actavia.tech</a></div>
+    <div class="foot-line">Proveedor de tecnología verificado de WhatsApp Business Platform</div>
+    <div class="foot-line">vos.chat · Virtual Operation System · <a href="https://actavia.tech" rel="noopener">Actavia LLC</a> · <a href="https://bloqueraiz.com" rel="noopener">BloqueRaíz</a> · <a href="privacidad.html">Privacidad</a> · <a href="terminos.html">Términos</a></div>
+  </div>
+</footer>
 
 <script>
   // ── Lista de espera ────────────────────────────────────────────────
@@ -485,6 +411,7 @@
       telefono: 'Ese número no parece válido. Revisalo, o dejalo vacío.',
       generico: 'Uy, algo falló. Probá de nuevo.'
     };
+    var LABEL = 'Pedir una demo';
 
     function fallar(clave) {
       errEl.textContent = MSG[clave] || MSG.generico;
@@ -495,7 +422,7 @@
       btn.disabled = false;
       input.disabled = false;
       phoneInput.disabled = false;
-      btn.textContent = 'Avisame';
+      btn.textContent = LABEL;
     }
 
     var busy = false;
