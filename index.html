@@ -174,6 +174,39 @@
   .foot a:hover{text-decoration:underline}
   .foot-line{margin:0 0 6px}
   .foot-line:last-child{margin-bottom:0}
+
+  /* ============ ARTÍCULOS (build.mjs, desde src/articulos) ============ */
+  .narrow{max-width:800px}
+  .doc{padding:48px 0 88px}
+  .crumbs{font-size:14px;color:var(--gris2);margin-bottom:24px}
+  .crumbs a{color:var(--gris2)}.crumbs span{margin:0 6px}
+  .doc h1{margin:0;font-weight:800;font-size:clamp(32px,5vw,50px);line-height:1.06;letter-spacing:-.025em}
+  .doc .lead{font-size:clamp(18px,2.2vw,20px);line-height:1.55;color:var(--gris);margin:20px 0 32px}
+  .doc h2{font-weight:800;font-size:clamp(25px,3vw,32px);line-height:1.15;letter-spacing:-.015em;margin:56px 0 14px;scroll-margin-top:24px}
+  .doc h3{font-weight:700;font-size:20px;margin:28px 0 8px}
+  .doc p{margin:0 0 16px;font-size:17px;line-height:1.65}
+  .doc ul,.doc ol.pasos{margin:0 0 20px 22px;padding:0;display:flex;flex-direction:column;gap:10px;font-size:17px;line-height:1.6}
+  .doc li b{color:var(--hondo)}
+  .doc a{color:var(--senal-texto)}
+  .toc{background:var(--arena);border-radius:16px;padding:20px 24px 20px 44px;display:grid;gap:6px;font-size:16.5px;margin:0}
+  .toc a{color:var(--tinta);text-decoration:none}.toc a:hover{color:var(--senal-texto);text-decoration:underline}
+  .tabla-wrap{overflow-x:auto;margin:8px 0 14px;background:#fff;border:1px solid var(--linea);border-radius:16px}
+  .cmp{width:100%;border-collapse:collapse;font-size:15.5px;min-width:600px}
+  .cmp th,.cmp td{text-align:left;vertical-align:top;padding:12px 14px;border-bottom:1px solid var(--linea);line-height:1.5}
+  .cmp tr:last-child th,.cmp tr:last-child td{border-bottom:none}
+  .cmp thead th{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--gris2)}
+  .faq-doc details{border-top:1px solid var(--linea);padding:16px 0}
+  .faq-doc details:last-child{border-bottom:1px solid var(--linea)}
+  .faq-doc summary{cursor:pointer;font-weight:700;font-size:17.5px;list-style:none;display:flex;justify-content:space-between;gap:16px;min-height:28px}
+  .faq-doc summary::-webkit-details-marker{display:none}
+  .faq-doc summary::after{content:"+";font-weight:400;font-size:22px;color:var(--senal-texto);line-height:1}
+  .faq-doc details[open] summary::after{content:"\2212"}
+  .faq-doc details p{margin-top:10px;color:var(--gris)}
+  .doc-cta{background:var(--hondo);color:var(--crema);border-radius:24px;padding:clamp(26px,4vw,40px);margin:56px 0 18px}
+  .doc-cta h2{color:var(--crema);margin:0 0 10px}
+  .doc-cta p{color:var(--sobre-hondo)}
+  .doc-cta .btn{margin-top:6px;color:#0B1F1A;text-decoration:none}
+  .doc .aviso{font-size:14.5px;color:var(--gris2);font-style:italic}
 </style>
 </head>
 <body>
@@ -187,6 +220,7 @@
       <a class="hide-sm" href="#canales">Canales</a>
       <a class="hide-sm" href="#cuidado">Cumplimiento</a>
       <a class="hide-sm" href="#familia">Familia</a>
+      <a class="hide-sm" href="/whatsapp-para-desarrolladoras-inmobiliarias">Guías</a>
       <a class="btn btn-crema" href="#anotarme">Pedir una demo</a>
     </div>
   </nav>
@@ -268,6 +302,7 @@
   <div class="container">
     <p class="eyebrow">Cuida lo que no se puede prometer</p>
     <h2 class="stitle">Vender en pozo tiene reglas. vos las respeta.</h2>
+    <p class="sdesc">Qué se puede responder en cada etapa, en nuestra guía sobre <a href="/proyecto-en-pozo-consultas-whatsapp">consultas de un proyecto en pozo</a>.</p>
     <div class="grid3">
       <div class="rule">
         <h3>No promete rentabilidad</h3>
@@ -428,6 +463,7 @@
 <footer class="foot">
   <div class="container">
     <div class="foot-line"><a href="https://wa.me/5491176539950">WhatsApp +54 9 11 7653-9950</a> · <a href="mailto:contact@actavia.tech">contact@actavia.tech</a></div>
+    <div class="foot-line">Guías: <a href="/whatsapp-para-desarrolladoras-inmobiliarias">WhatsApp para desarrolladoras</a> · <a href="/precalificar-interesados-inmobiliarios">Precalificar interesados</a> · <a href="/proyecto-en-pozo-consultas-whatsapp">Consultas de un proyecto en pozo</a></div>
     <div class="foot-line">Proveedor de tecnología verificado de WhatsApp Business Platform</div>
     <div class="foot-line">vos.chat · Virtual Operation System · <a href="https://actavia.tech" rel="noopener">Actavia LLC</a> · <a href="https://bloqueraiz.com" rel="noopener">BloqueRaíz</a> · <a href="https://avala.rent" rel="noopener">Avala</a> · <a href="privacidad.html">Privacidad</a> · <a href="terminos.html">Términos</a></div>
   </div>

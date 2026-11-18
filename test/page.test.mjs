@@ -19,6 +19,9 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 
 const require = createRequire(import.meta.url);
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+// Los artículos que genera build.mjs, por su path (sin la barra).
+const ARTICULOS = readdirSync(join(ROOT, 'src/articulos')).filter((f) => f.endsWith('.html')).sort()
+  .map((f) => readFileSync(join(ROOT, 'src/articulos', f), 'utf8').match(/^path: \/(.+)$/m)[1].trim());
 const { __internals } = require(join(ROOT, 'api', 'page.js'));
 const { safeHref, renderBusiness, setSecurityHeaders, sendBusiness, buildJsonLd, jsonLdHash, SCHEMES_WEBSITE, SCHEMES_MACHINE, SCHEMES_TEL, CSP } = __internals;
 
@@ -410,7 +413,7 @@ section('RUTEO · el motor no recibe consultas por paths de vos.chat (H3)');
     return { urls, res };
   }
 
-  for (const slug of ['privacidad', 'terminos', 'index', 'videos', 'api']) {
+  for (const slug of ['privacidad', 'terminos', 'index', 'videos', 'api', ...ARTICULOS]) {
     const { urls, res } = await consultasAlMotor(slug);
     check(urls.length === 0, `/${slug} → el motor NO recibe ninguna consulta (antes: sí, por "${slug}")`);
     check(res.code === 404, `/${slug} → 404, no la página de un negocio con ese nombre`);
@@ -422,7 +425,7 @@ section('RUTEO · el motor no recibe consultas por paths de vos.chat (H3)');
   check(urls.length === 1 && urls[0].endsWith('/api/public/page/cafe-luna'),
     'un slug de negocio sigue llegando al motor igual que antes');
 
-  check(RESERVED_SLUGS.size === 5, 'la lista reservada es SOLO lo que este repo ocupa de verdad, no nombres por las dudas');
+  check(RESERVED_SLUGS.size === 5 + ARTICULOS.length, 'la lista reservada es SOLO lo que este repo ocupa de verdad (estáticas + artículos), no nombres por las dudas');
 
   // Los que llevan punto ya se rechazaban por el regex, sin tocar el motor.
   for (const slug of ['robots.txt', 'sitemap.xml', 'favicon.ico']) {
@@ -440,7 +443,7 @@ section('RUTEO · vercel.json resuelve las estáticas antes del catch-all');
   const iCatchAll = rewrites.findIndex((r) => r.source === '/:pageSlug');
   check(iCatchAll !== -1, 'el catch-all de páginas de negocio sigue existiendo');
 
-  for (const pagina of ['privacidad', 'terminos']) {
+  for (const pagina of ['privacidad', 'terminos', ...ARTICULOS]) {
     const i = rewrites.findIndex((r) => r.source === `/${pagina}`);
     check(i !== -1, `/${pagina} tiene su propio rewrite`);
     check(i < iCatchAll, `y está ANTES del catch-all (si no, no sirve de nada)`);
@@ -469,7 +472,8 @@ section('ESTÁTICAS · headers de seguridad (H4, la otra mitad de B-03)');
   const fuentes = reglas.map((r) => r.source).sort();
   check(!fuentes.some((f) => f === '/(.*)' || f === '/:path*' || f === '/(.*)?'),
     'ninguna regla usa un catch-all: no puede alcanzar a /api/page ni pisarle la CSP');
-  check(fuentes.join(' | ') === '/ | /(index.html|privacidad|privacidad.html|terminos|terminos.html) | /videos/(.*)',
+  const DOCS = '/(index.html|privacidad|privacidad.html|terminos|terminos.html' + ARTICULOS.map((a) => `|${a}|${a}.html`).join('') + ')';
+  check(fuentes.join(' | ') === `/ | ${DOCS} | /videos/(.*)`,
     `los sources son exactamente los paths estáticos de este repo (${fuentes.join(' | ')})`);
 
   const documentos = reglas.filter((r) => valor(r, 'Content-Security-Policy'));
@@ -494,7 +498,7 @@ section('ESTÁTICAS · headers de seguridad (H4, la otra mitad de B-03)');
   // Este es el check que importa: si mañana alguien agrega un script, una
   // tipografía o un iframe de otro host y no toca la CSP, esto falla acá y no
   // en producción con la página rota.
-  const PAGINAS = ['index.html', 'privacidad.html', 'terminos.html'];
+  const PAGINAS = ['index.html', 'privacidad.html', 'terminos.html', ...ARTICULOS.map((a) => `${a}.html`)];
   const externos = new Set();
   let inlineScript = false;
   let inlineStyle = false;

@@ -9,6 +9,18 @@
       "destination": "/terminos.html"
     },
     {
+      "source": "/whatsapp-para-desarrolladoras-inmobiliarias",
+      "destination": "/whatsapp-para-desarrolladoras-inmobiliarias.html"
+    },
+    {
+      "source": "/precalificar-interesados-inmobiliarios",
+      "destination": "/precalificar-interesados-inmobiliarios.html"
+    },
+    {
+      "source": "/proyecto-en-pozo-consultas-whatsapp",
+      "destination": "/proyecto-en-pozo-consultas-whatsapp.html"
+    },
+    {
       "source": "/:pageSlug",
       "destination": "/api/page?slug=:pageSlug"
     }
@@ -36,7 +48,7 @@
       ]
     },
     {
-      "source": "/(index.html|privacidad|privacidad.html|terminos|terminos.html)",
+      "source": "/(index.html|privacidad|privacidad.html|terminos|terminos.html|precalificar-interesados-inmobiliarios|precalificar-interesados-inmobiliarios.html|proyecto-en-pozo-consultas-whatsapp|proyecto-en-pozo-consultas-whatsapp.html|whatsapp-para-desarrolladoras-inmobiliarias|whatsapp-para-desarrolladoras-inmobiliarias.html)",
       "headers": [
         {
           "key": "Content-Security-Policy",
