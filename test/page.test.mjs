@@ -503,7 +503,10 @@ section('ESTÁTICAS · headers de seguridad (H4, la otra mitad de B-03)');
     const html = readFileSync(join(ROOT, f), 'utf8');
     // SUBRECURSOS (lo que el browser baja), no <a href>, que es navegación y
     // ninguna directiva de fetch alcanza.
+    // <link rel="canonical|alternate"> es metadato para buscadores: el browser
+    // no lo descarga, así que tampoco cuenta.
     for (const m of html.matchAll(/<(?:link|script|img|source|iframe)\b[^>]*\b(?:href|src)="(https?:\/\/[^"]+)"/g)) {
+      if (/^<link\b[^>]*\brel="(?:canonical|alternate)"/.test(m[0])) continue;
       externos.add(new URL(m[1]).origin);
     }
     if (/<script>/.test(html)) inlineScript = true;
