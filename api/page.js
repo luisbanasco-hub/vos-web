@@ -149,7 +149,7 @@ const INSTAGRAM_HANDLE = /^[A-Za-z0-9._]{1,30}$/;
 // autoritativa de reservados es una decision de vos-app, no de acá.
 // Rutas que ocupa este repo: las estáticas y los artículos (build.mjs).
 const RESERVED_SLUGS = new Set([
-  'api', 'index', 'privacidad', 'terminos', 'videos',
+  'api', 'index', 'privacidad', 'terminos', 'videos', 'en', 'pt',
   'whatsapp-para-desarrolladoras-inmobiliarias', 'precalificar-interesados-inmobiliarios', 'proyecto-en-pozo-consultas-whatsapp',
 ]);
 

@@ -100,9 +100,65 @@ ${PIE}
   console.log(`${salida.padEnd(50)} ${faq.length} preguntas`);
 }
 
+// ── Home en inglés y portugués: index.html + src/i18n.json → en.html (/en) y pt.html (/pt) ──
+// Se reemplazan los textos por coincidencia exacta: un texto de nodo (entre etiquetas),
+// un atributo de accesibilidad o una cadena del JavaScript. Si un texto en español ya no
+// existe en index.html, el build falla: así nadie cambia la home y olvida traducirla.
+const I18N = JSON.parse(readFileSync(join(RAIZ, 'src/i18n.json'), 'utf8'));
+const reEsc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const htmlEsc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+function cambiar(s, re, por, que) {
+  let n = 0;
+  const out = s.replace(re, (...m) => { n++; return por(...m); });
+  if (!n) throw new Error(`i18n: no encontré "${que}" en index.html`);
+  return out;
+}
+const IDIOMAS = { en: 1, pt: 2 };
+for (const [code, col] of Object.entries(IDIOMAS)) {
+  const H = I18N.head[code];
+  let s = HOME;
+  const cuerpo = s.indexOf('<body>');
+  let head = s.slice(0, cuerpo);
+  let body = s.slice(cuerpo);
+  // <head>
+  head = cambiar(head, /<html lang="es-AR">/, () => `<html lang="${H.lang}">`, 'html lang');
+  head = cambiar(head, /<title>[^<]*<\/title>/, () => `<title>${esc(H.title)}</title>`, 'title');
+  head = cambiar(head, /<meta name="description" content="[^"]*">/, () => `<meta name="description" content="${esc(H.desc)}">`, 'description');
+  head = cambiar(head, /<meta property="og:title" content="[^"]*">/, () => `<meta property="og:title" content="${esc(H.ogt)}">`, 'og:title');
+  head = cambiar(head, /<meta property="og:description" content="[^"]*">/, () => `<meta property="og:description" content="${esc(H.ogd)}">`, 'og:description');
+  head = cambiar(head, /<meta property="og:url" content="[^"]*">/, () => `<meta property="og:url" content="${SITE}/${code}">`, 'og:url');
+  head = cambiar(head, /<meta property="og:locale" content="[^"]*">/, () => `<meta property="og:locale" content="${H.locale}">`, 'og:locale');
+  head = cambiar(head, /<link rel="canonical" href="[^"]*">/, () => `<link rel="canonical" href="${SITE}/${code}">`, 'canonical');
+  head = cambiar(head, /"inLanguage":"es"/, () => `"inLanguage":"${code}"`, 'inLanguage');
+  // Textos de la página
+  for (const fila of I18N.textos) {
+    const es = fila[0], tr = fila[col];
+    const e = reEsc(htmlEsc(es)).replace(/"/g, '(?:"|&quot;)');
+    const nodo = new RegExp(`(>\\s*)${e}(\\s*<)`, 'g');
+    const attr = new RegExp(`((?:placeholder|aria-label|title|alt)=")${reEsc(es)}(")`, 'g');
+    let n = 0;
+    body = body.replace(nodo, (m, a, b) => { n++; return a + htmlEsc(tr) + b; });
+    body = body.replace(attr, (m, a, b) => { n++; return a + esc(tr) + b; });
+    if (!n) throw new Error(`i18n: no encontré el texto "${es.slice(0, 60)}" en index.html`);
+  }
+  // JavaScript del formulario
+  for (const fila of I18N.js) body = cambiar(body, new RegExp(reEsc(fila[0]), 'g'), () => fila[col], fila[0]);
+  // Botón de WhatsApp: mensaje precargado en el idioma
+  body = cambiar(body, /(wa\.me\/5491176539950\?text=)[^"]*/, (m, a) => a + encodeURIComponent(H.wa).replace(/'/g, '%27'), 'botón de WhatsApp');
+  // Selector de idioma y enlaces de la familia a la versión en el mismo idioma
+  body = cambiar(body, /<a href="\/" hreflang="es" lang="es" aria-current="true">ES<\/a>/, () => '<a href="/" hreflang="es" lang="es">ES</a>', 'selector ES');
+  body = cambiar(body, new RegExp(`<a href="/${code}" hreflang="${code}" lang="${code}">`), () => `<a href="/${code}" hreflang="${code}" lang="${code}" aria-current="true">`, 'selector ' + code);
+  body = cambiar(body, /href="https:\/\/bloqueraiz\.com"/g, () => `href="https://bloqueraiz.com/${code}"`, 'enlace a BloqueRaíz');
+  body = cambiar(body, /href="https:\/\/avala\.rent"/g, () => `href="https://avala.rent/${code}"`, 'enlace a Avala');
+  writeFileSync(join(RAIZ, `${code}.html`), head + body);
+  console.log(`${code}.html`.padEnd(50) + ` ${I18N.textos.length} textos`);
+}
+
 const HOY = new Date().toISOString().slice(0, 10);
 const filas = [
   { loc: SITE + '/', mod: HOY },
+  { loc: SITE + '/en', mod: HOY },
+  { loc: SITE + '/pt', mod: HOY },
   ...articulos.map((a) => ({ loc: SITE + a.path, mod: a.modified })),
   { loc: SITE + '/privacidad', mod: '2026-11-18' },
   { loc: SITE + '/terminos', mod: '2026-11-18' },

@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>vos · The WhatsApp assistant for real estate developers</title>
+<meta name="description" content="VOS answers WhatsApp with each project’s details: unit types, construction stage and site visits. It pre-qualifies prospects and passes them to your sales team.">
+<link rel="canonical" href="https://vos.chat/en">
+<link rel="alternate" hreflang="es" href="https://vos.chat/">
+<link rel="alternate" hreflang="en" href="https://vos.chat/en">
+<link rel="alternate" hreflang="pt" href="https://vos.chat/pt">
+<link rel="alternate" hreflang="x-default" href="https://vos.chat/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="vos.chat">
+<meta property="og:url" content="https://vos.chat/en">
+<meta property="og:title" content="vos · The WhatsApp assistant for real estate developers">
+<meta property="og:description" content="Answers your WhatsApp with each project’s details, pre-qualifies every prospect and passes site-visit requests to your team.">
+<meta property="og:image" content="https://vos.chat/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://vos.chat/#org","name":"VOS","url":"https://vos.chat/","logo":"https://vos.chat/og.png","email":"contact@actavia.tech","description":"Asistente de WhatsApp para desarrolladoras inmobiliarias: atiende con los datos de cada proyecto, precalifica interesados y pasa los pedidos de visita al equipo. Un producto de Actavia.","parentOrganization":{"@type":"Organization","@id":"https://actavia.tech/#org","name":"Actavia LLC","url":"https://actavia.tech"},"areaServed":["AR","UY","Latin America"],"telephone":"+5491176539950"},{"@type":"WebSite","@id":"https://vos.chat/#site","url":"https://vos.chat/","name":"vos","inLanguage":"en","publisher":{"@id":"https://vos.chat/#org"}},{"@type":"SoftwareApplication","@id":"https://vos.chat/#app","name":"VOS","applicationCategory":"BusinessApplication","operatingSystem":"Web, WhatsApp","description":"Atiende el WhatsApp de una desarrolladora inmobiliaria con los datos de cada proyecto, precalifica a cada interesado y registra los pedidos de visita a obra o showroom.","provider":{"@id":"https://vos.chat/#org"},"url":"https://vos.chat/"},{"@type":"Organization","@id":"https://actavia.tech/#org","name":"Actavia LLC","url":"https://actavia.tech","brand":[{"@type":"Brand","name":"VOS","url":"https://vos.chat"},{"@type":"Brand","name":"BloqueRaíz","url":"https://bloqueraiz.com"},{"@type":"Brand","name":"Avala","url":"https://avala.rent"}]}]}</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%2312302A'/%3E%3Ctext x='7' y='27' font-family='Arial,sans-serif' font-weight='900' font-size='20' fill='%23F6F3EC'%3Ev%3C/text%3E%3Ccircle cx='28' cy='25' r='3.4' fill='%238CCBA6'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --hondo:#12302A;--hondo2:#1B3D35;--senal:#8CCBA6;--senal-texto:#2F7556;
+    --crema:#F6F3EC;--arena:#ECE7DB;--linea:#DDD7C9;--tinta:#1C221F;--gris:#4A544F;--gris2:#5C6660;
+    --sobre-hondo:#DCE5DF;--borde-hondo:#4C6A60
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html{scroll-behavior:smooth}
+  html,body{margin:0}
+  body{font-family:'DM Sans',system-ui,sans-serif;color:var(--tinta);background:var(--crema);-webkit-font-smoothing:antialiased}
+  h1,h2,h3,.display{font-family:'Archivo',system-ui,sans-serif}
+  img,svg{max-width:100%}
+  a{color:inherit}
+  .container{max-width:1180px;margin:0 auto;padding:0 20px}
+  @media(min-width:640px){.container{padding:0 40px}}
+
+  /* ============ MARCA ============ */
+  .wm{display:inline-flex;align-items:baseline;gap:4px;text-decoration:none;color:inherit}
+  .wm b{font-family:'Archivo',sans-serif;font-weight:800;font-size:30px;letter-spacing:-.045em;line-height:1}
+  .wm i{width:9px;height:9px;border-radius:50%;background:var(--senal);display:inline-block}
+
+  /* ============ HERO ============ */
+  .hero{background:var(--hondo);color:var(--crema)}
+  .nav{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;padding-top:20px;padding-bottom:20px}
+  .navlinks{display:flex;flex-wrap:wrap;align-items:center;gap:22px;font-size:15px}
+  .navlinks a{color:var(--sobre-hondo);text-decoration:none}
+  .navlinks a:hover{color:#fff}
+  .navlinks a.btn-crema,.navlinks a.btn-crema:hover{color:var(--hondo)}
+  .langs{display:inline-flex;border:1px solid var(--borde-hondo);border-radius:999px;overflow:hidden}
+  .navlinks .langs a{font-size:13px;font-weight:700;letter-spacing:.06em;padding:8px 11px;min-height:36px;display:inline-flex;align-items:center;color:var(--sobre-hondo)}
+  .navlinks .langs a[aria-current="true"]{background:var(--crema);color:var(--hondo)}
+  .navlinks .hide-sm{display:none}
+  @media(min-width:760px){.navlinks .hide-sm{display:inline}}
+  .herogrid{display:flex;flex-wrap:wrap;gap:48px;align-items:center;padding-top:56px;padding-bottom:88px}
+  .herocopy{flex:1 1 480px;min-width:0;display:flex;flex-direction:column;gap:22px}
+  .kick{margin:0;font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--senal)}
+  .h1{margin:0;font-weight:800;font-size:clamp(38px,6.2vw,62px);line-height:1.03;letter-spacing:-.03em}
+  .sub{margin:0;font-size:clamp(17px,2.4vw,19px);line-height:1.55;color:var(--sobre-hondo);max-width:34em}
+  .heroctas{display:flex;flex-wrap:wrap;gap:12px;padding-top:6px}
+  .btn{min-height:52px;border-radius:999px;border:none;font-weight:700;font-size:16px;font-family:inherit;cursor:pointer;transition:transform .15s,background .2s,border-color .2s;padding:0 26px;display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+  .btn:hover{transform:translateY(-1px)}
+  .btn-senal{background:var(--senal);color:#0B1F1A}
+  .btn-senal:hover{background:#9ED6B5}
+  .btn-crema{background:var(--crema);color:var(--hondo);min-height:44px;padding:0 20px;font-size:15px}
+  .btn-ghost{background:transparent;color:var(--crema);border:1px solid var(--borde-hondo);font-weight:500}
+  .btn-ghost:hover{border-color:var(--senal)}
+  .btn-hondo{background:var(--hondo);color:var(--crema)}
+  .btn-linea{background:transparent;color:var(--hondo);border:1px solid var(--hondo)}
+  .fine{margin:0;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#B9C7BF}
+
+  /* Chat de ejemplo */
+  .herochat{flex:1 1 360px;min-width:0;display:flex;justify-content:center}
+  .chat{width:100%;max-width:400px;background:var(--crema);color:var(--tinta);border-radius:28px;padding:18px;display:flex;flex-direction:column;gap:11px}
+  .chathead{display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--linea)}
+  .chatav{width:40px;height:40px;border-radius:50%;background:var(--hondo);color:var(--crema);display:flex;align-items:center;justify-content:center;font-family:'Archivo',sans-serif;font-weight:800;font-size:16px;flex-shrink:0}
+  .chathead b{display:block;font-size:15px}
+  .chathead span{font-size:13px;color:var(--gris2)}
+  .msg{padding:11px 14px;font-size:15px;line-height:1.45;max-width:86%}
+  .msg.in{align-self:flex-end;background:#DCEBDF;border-radius:16px 16px 4px 16px;max-width:80%}
+  .msg.out{align-self:flex-start;background:#fff;border-radius:16px 16px 16px 4px}
+  .chatnote{align-self:center;font-size:12px;color:var(--gris2);background:var(--arena);padding:6px 12px;border-radius:999px}
+
+  /* ============ SECCIONES ============ */
+  section{padding:88px 0}
+  .eyebrow{margin:0 0 12px;font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--senal-texto)}
+  .stitle{margin:0 0 16px;font-weight:800;font-size:clamp(30px,4.6vw,44px);line-height:1.08;letter-spacing:-.02em;max-width:22ch}
+  .sdesc{margin:0;font-size:clamp(16px,2.2vw,18px);line-height:1.6;color:var(--gris);max-width:44em}
+  .grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:44px}
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;margin-top:40px}
+  .card{background:#fff;border:1px solid var(--linea);border-radius:20px;padding:26px;display:flex;flex-direction:column;gap:10px}
+  .card .num{font-family:'Archivo',sans-serif;font-weight:800;font-size:15px;color:var(--senal-texto)}
+  .card h3,.rule h3{margin:0;font-size:21px;font-weight:700;line-height:1.25}
+  .card p,.rule p{margin:0;font-size:16px;line-height:1.55;color:var(--gris)}
+  .rule{border-top:3px solid var(--hondo);padding-top:18px;display:flex;flex-direction:column;gap:10px}
+
+  .arena{background:var(--arena)}
+  .split{display:flex;flex-wrap:wrap;gap:48px;align-items:center}
+  .split > div{flex:1 1 420px;min-width:0}
+  .channels{display:flex;flex-direction:column;gap:12px}
+  .channel{background:#fff;border-radius:16px;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .channel b{font-family:'Archivo',sans-serif;font-weight:700;font-size:20px}
+  .channel span{font-size:14px;font-weight:700;color:var(--gris2)}
+  .channel span.on{color:var(--senal-texto)}
+
+  /* ============ TU NÚMERO + MODAL ============ */
+  .coex-note{font-size:15px;line-height:1.55;color:var(--gris);margin:36px 0 0;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+  .infobtn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;border:1.5px solid var(--hondo);background:transparent;color:var(--hondo);font-family:'Archivo',sans-serif;font-weight:800;font-size:14px;line-height:1;cursor:pointer;flex-shrink:0}
+  .infobtn:hover{background:var(--hondo);color:var(--crema)}
+  .infobtn:focus-visible{outline:2px solid var(--senal-texto);outline-offset:2px}
+  .coex-fine{font-size:14px;line-height:1.5;color:var(--gris2);margin:10px 0 0}
+
+  .modal-overlay{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(11,31,26,.72);animation:rise .2s ease both}
+  .modal-card{position:relative;max-width:520px;width:100%;max-height:88vh;overflow-y:auto;background:var(--crema);color:var(--tinta);border-radius:22px;padding:36px 28px 30px;text-align:left;box-shadow:0 30px 80px -20px rgba(0,0,0,.5)}
+  .modal-card h3{font-weight:800;font-size:24px;margin:0 0 14px}
+  .modal-card p{font-size:15px;line-height:1.6;color:var(--gris);margin:0 0 14px}
+  .modal-card ul{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:10px}
+  .modal-card li{position:relative;padding-left:18px;font-size:14.5px;line-height:1.55;color:var(--tinta)}
+  .modal-card li::before{content:"";position:absolute;left:2px;top:9px;width:6px;height:6px;border-radius:50%;background:var(--senal-texto)}
+  .modal-card b{font-weight:700;color:var(--tinta)}
+  .modal-card .modal-cond{border-top:1px solid var(--linea);padding-top:16px}
+  .modal-card .modal-foot{font-size:14px;margin-bottom:0}
+  .modal-close{position:absolute;top:10px;right:12px;width:44px;height:44px;border:none;background:transparent;color:var(--gris);font-size:28px;line-height:1;cursor:pointer;border-radius:10px}
+  .modal-close:hover{background:var(--arena);color:var(--tinta)}
+  .modal-close:focus-visible{outline:2px solid var(--senal-texto);outline-offset:2px}
+
+  /* ============ PRECIO ============ */
+  .price-card{max-width:520px;margin:40px 0 0;background:#fff;border:1px solid var(--linea);border-radius:22px;padding:34px 30px}
+  .price-card .pname{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--senal-texto);font-weight:700}
+  .price-card .pbody{font-size:16px;line-height:1.55;color:var(--gris);margin:16px 0 0}
+  .price-card .pbody strong{color:var(--tinta);font-weight:700}
+  .plist{list-style:none;margin:24px 0 0;padding:0;display:flex;flex-direction:column;gap:11px}
+  .plist li{font-size:15.5px;color:var(--tinta);display:flex;gap:10px;align-items:flex-start;line-height:1.45}
+  .plist svg{width:18px;height:18px;flex-shrink:0;margin-top:2px;fill:var(--senal-texto)}
+  .price-card .btn{width:100%;margin-top:28px}
+
+  /* ============ OTROS SECTORES ============ */
+  .band{background:#fff;border:1px solid var(--linea);border-radius:24px;padding:34px;display:flex;flex-wrap:wrap;gap:22px;align-items:center;justify-content:space-between}
+  .band div{flex:1 1 480px;min-width:0}
+  .band h2{margin:0 0 8px;font-weight:700;font-size:26px;line-height:1.2}
+  .band p{margin:0;font-size:16px;line-height:1.55;color:var(--gris)}
+
+  /* ============ FAMILIA ============ */
+  .fam .card .rol{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gris2)}
+  .fam .card a{font-weight:700;color:var(--hondo);margin-top:4px}
+  .fam .card.aca{border:2px solid var(--hondo)}
+  .fam .card.aca .rol{color:var(--senal-texto)}
+  .juntos{margin:32px 0 0;font-size:17px;line-height:1.6;color:var(--gris);max-width:44em}
+
+  /* ============ CTA / FORM ============ */
+  .cta-section{background:var(--hondo);color:var(--crema)}
+  .cta-section .eyebrow{color:var(--senal)}
+  .cta-section .stitle{color:var(--crema)}
+  .cta-section .sdesc{color:var(--sobre-hondo)}
+  .formzone{width:100%;max-width:460px;margin:34px 0 0}
+  .form{display:flex;flex-direction:column;gap:11px}
+  .field{width:100%;min-height:52px;border-radius:14px;border:1px solid var(--borde-hondo);background:var(--hondo2);color:var(--crema);font-weight:500;font-size:16px;font-family:inherit;padding:0 18px;outline:none;transition:border-color .2s}
+  .field::placeholder{color:#A9BBB2}
+  .field:focus{border-color:var(--senal)}
+  .form .btn{width:100%}
+  /* Honeypot: fuera de la vista de todos, sin ocupar lugar y sin animarse.
+     No se usa [hidden] ni display:none porque hay bots que saltean justo eso. */
+  .hp{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+  .phonehint{font-size:13.5px;color:#B9C7BF;margin:-2px 2px 0}
+  .done{display:flex;flex-direction:column;gap:8px;padding:24px 22px;border-radius:16px;background:var(--hondo2);border:1px solid var(--borde-hondo);animation:rise .5s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .donetitle{font-family:'Archivo',sans-serif;font-weight:800;font-size:21px;line-height:1.2;color:var(--senal)}
+  .donesub{font-size:15px;line-height:1.5;color:var(--sobre-hondo)}
+  .err{margin-top:11px;font-weight:500;font-size:14px;line-height:1.4;color:#F2B999;animation:rise .4s ease both}
+
+  /* ============ PIE ============ */
+  .foot{padding:28px 0 36px;font-size:14px;line-height:1.6;color:#B9C7BF;background:var(--hondo);border-top:1px solid #2A4A42}
+  .foot a{color:var(--sobre-hondo);text-decoration:none}
+  .foot a:hover{text-decoration:underline}
+  .foot-line{margin:0 0 6px}
+  .foot-line:last-child{margin-bottom:0}
+
+  /* ============ ARTÍCULOS (build.mjs, desde src/articulos) ============ */
+  .narrow{max-width:800px}
+  .doc{padding:48px 0 88px}
+  .crumbs{font-size:14px;color:var(--gris2);margin-bottom:24px}
+  .crumbs a{color:var(--gris2)}.crumbs span{margin:0 6px}
+  .doc h1{margin:0;font-weight:800;font-size:clamp(32px,5vw,50px);line-height:1.06;letter-spacing:-.025em}
+  .doc .lead{font-size:clamp(18px,2.2vw,20px);line-height:1.55;color:var(--gris);margin:20px 0 32px}
+  .doc h2{font-weight:800;font-size:clamp(25px,3vw,32px);line-height:1.15;letter-spacing:-.015em;margin:56px 0 14px;scroll-margin-top:24px}
+  .doc h3{font-weight:700;font-size:20px;margin:28px 0 8px}
+  .doc p{margin:0 0 16px;font-size:17px;line-height:1.65}
+  .doc ul,.doc ol.pasos{margin:0 0 20px 22px;padding:0;display:flex;flex-direction:column;gap:10px;font-size:17px;line-height:1.6}
+  .doc li b{color:var(--hondo)}
+  .doc a{color:var(--senal-texto)}
+  .toc{background:var(--arena);border-radius:16px;padding:20px 24px 20px 44px;display:grid;gap:6px;font-size:16.5px;margin:0}
+  .toc a{color:var(--tinta);text-decoration:none}.toc a:hover{color:var(--senal-texto);text-decoration:underline}
+  .tabla-wrap{overflow-x:auto;margin:8px 0 14px;background:#fff;border:1px solid var(--linea);border-radius:16px}
+  .cmp{width:100%;border-collapse:collapse;font-size:15.5px;min-width:600px}
+  .cmp th,.cmp td{text-align:left;vertical-align:top;padding:12px 14px;border-bottom:1px solid var(--linea);line-height:1.5}
+  .cmp tr:last-child th,.cmp tr:last-child td{border-bottom:none}
+  .cmp thead th{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--gris2)}
+  .faq-doc details{border-top:1px solid var(--linea);padding:16px 0}
+  .faq-doc details:last-child{border-bottom:1px solid var(--linea)}
+  .faq-doc summary{cursor:pointer;font-weight:700;font-size:17.5px;list-style:none;display:flex;justify-content:space-between;gap:16px;min-height:28px}
+  .faq-doc summary::-webkit-details-marker{display:none}
+  .faq-doc summary::after{content:"+";font-weight:400;font-size:22px;color:var(--senal-texto);line-height:1}
+  .faq-doc details[open] summary::after{content:"\2212"}
+  .faq-doc details p{margin-top:10px;color:var(--gris)}
+  .doc-cta{background:var(--hondo);color:var(--crema);border-radius:24px;padding:clamp(26px,4vw,40px);margin:56px 0 18px}
+  .doc-cta h2{color:var(--crema);margin:0 0 10px}
+  .doc-cta p{color:var(--sobre-hondo)}
+  .doc-cta .btn{margin-top:6px;color:#0B1F1A;text-decoration:none}
+  .doc .aviso{font-size:14.5px;color:var(--gris2);font-style:italic}
+  .wa-float{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));z-index:50;width:58px;height:58px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.22);transition:transform .15s;text-decoration:none}.wa-float:hover{transform:scale(1.06)}.wa-float:focus-visible{outline:3px solid #fff;outline-offset:3px;box-shadow:0 0 0 6px #1C221F}@media print{.wa-float{display:none}}
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <nav class="container nav" aria-label="Main">
+    <a class="wm" href="/" aria-label="vos, home"><b>vos</b><i aria-hidden="true"></i></a>
+    <div class="navlinks">
+      <a class="hide-sm" href="#como-funciona">How it works</a>
+      <a class="hide-sm" href="#canales">Channels</a>
+      <a class="hide-sm" href="#cuidado">Compliance</a>
+      <a class="hide-sm" href="#familia">Family</a>
+      <a class="hide-sm" href="/whatsapp-para-desarrolladoras-inmobiliarias">Guides</a>
+      <span class="langs" role="group" aria-label="Idioma / Language"><a href="/" hreflang="es" lang="es">ES</a><a href="/en" hreflang="en" lang="en" aria-current="true">EN</a><a href="/pt" hreflang="pt" lang="pt">PT</a></span>
+      <a class="btn btn-crema" href="#anotarme">Request a demo</a>
+    </div>
+  </nav>
+  <div class="container herogrid">
+    <div class="herocopy">
+      <p class="kick">For real estate developers</p>
+      <h1 class="h1">Your prospects ask at all hours. VOS answers with each project’s details.</h1>
+      <p class="sub">An assistant that answers your WhatsApp: it knows every building, unit type and construction stage, pre-qualifies each prospect and passes site-visit requests to your team.</p>
+      <div class="heroctas">
+        <a class="btn btn-senal" href="#anotarme">Request a demo</a>
+        <a class="btn btn-ghost" href="#como-funciona">See how it works</a>
+      </div>
+      <p class="fine">Your number · Your data · Your final say</p>
+    </div>
+    <div class="herochat">
+      <div class="chat" role="img" aria-label="Example WhatsApp conversation between a prospect and VOS">
+        <div class="chathead">
+          <div class="chatav" aria-hidden="true">v</div>
+          <div><b>Your company</b><span>Answered by vos · WhatsApp</span></div>
+        </div>
+        <div class="msg in">Hi, are there any one-bedroom units left in building 3? Can I go see the site?</div>
+        <div class="msg out">Hi! Building 3 has one-bedroom units on the plans. Construction is at the structural stage. Is it to live in or to invest?</div>
+        <div class="msg in">To live in. Saturday morning works for me.</div>
+        <div class="msg out">Great. I’ll pass your Saturday-morning visit request to the sales team and they’ll confirm here.</div>
+        <div class="chatnote">Lead sent to the team · site visit</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ CÓMO FUNCIONA ============ -->
+<section id="como-funciona">
+  <div class="container">
+    <p class="eyebrow">What VOS does</p>
+    <h2 class="stitle">From the first message to the site visit, with no one left waiting.</h2>
+    <div class="grid4">
+      <div class="card">
+        <span class="num">01</span>
+        <h3>Knows every project</h3>
+        <p>Buildings, unit types, amenities and construction stage. If you have several projects, it understands which one is being asked about.</p>
+      </div>
+      <div class="card">
+        <span class="num">02</span>
+        <h3>Pre-qualifies</h3>
+        <p>To live in or to invest, how many rooms, what timeframe. It asks just enough, in your brand’s tone.</p>
+      </div>
+      <div class="card">
+        <span class="num">03</span>
+        <h3>Takes the visit request</h3>
+        <p>To the site or the showroom, with a day and time slot. Your team confirms it: VOS never promises what it can’t deliver.</p>
+      </div>
+      <div class="card">
+        <span class="num">04</span>
+        <h3>Notifies your team</h3>
+        <p>The prospect’s details arrive by WhatsApp and email to the person you choose, project by project.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CANALES ============ -->
+<section class="arena" id="canales">
+  <div class="container split">
+    <div>
+      <p class="eyebrow">One brain, three channels</p>
+      <h2 class="stitle">Load the project once. It answers the same everywhere.</h2>
+      <p class="sdesc">Unit types, stages and approved texts live in one place. When something changes, it changes for every channel at once. And if you operate in more than one country, each can have its own number.</p>
+    </div>
+    <div class="channels">
+      <div class="channel"><b>WhatsApp</b><span class="on">Live</span></div>
+      <div class="channel"><b>Instagram</b><span>Coming soon</span></div>
+      <div class="channel"><b>Chat on your website</b><span>Coming soon</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CUMPLIMIENTO ============ -->
+<section id="cuidado">
+  <div class="container">
+    <p class="eyebrow">It guards what can’t be promised</p>
+    <h2 class="stitle">Selling off-plan has rules. VOS follows them.</h2>
+    <p class="sdesc">What can be said at each stage, in our guide (in Spanish) on <a href="/proyecto-en-pozo-consultas-whatsapp">inquiries about an off-plan project</a>.</p>
+    <div class="grid3">
+      <div class="rule">
+        <h3>It doesn’t promise returns</h3>
+        <p>No returns, no appreciation, no "it’s a good investment". If the prospect insists, it hands them to your team.</p>
+      </div>
+      <div class="rule">
+        <h3>It respects each project’s stage</h3>
+        <p>Information only, offering in preparation or units for sale: what it can say changes with the stage you set.</p>
+      </div>
+      <div class="rule">
+        <h3>Texts your team approves</h3>
+        <p>Sensitive phrases come from text approved by your company, not from the model improvising.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TU NÚMERO, TU WHATSAPP ============ -->
+<section class="arena" id="tu-numero">
+  <div class="container">
+    <p class="eyebrow">Your number, your WhatsApp</p>
+    <h2 class="stitle">You change nothing. You just stop losing prospects.</h2>
+    <p class="sdesc">Your team keeps using the same WhatsApp Business, with the number already on your signs and social media, and with the full history. VOS answers when no one gets to it, and you see every conversation on the phone.</p>
+    <div class="grid3">
+      <div class="rule">
+        <h3>The same number</h3>
+        <p>The one on the construction sign and in your ads. That one.</p>
+      </div>
+      <div class="rule">
+        <h3>The same app</h3>
+        <p>You see the conversations, you see what VOS answered, and you reply whenever you want.</p>
+      </div>
+      <div class="rule">
+        <h3>Your team is in charge</h3>
+        <p>If someone on your team writes, VOS steps aside. When you want it back, you just ask.</p>
+      </div>
+    </div>
+    <p class="coex-note">Some WhatsApp features change when you connect. <button type="button" class="infobtn" id="coexInfoBtn" aria-haspopup="dialog" aria-controls="coexModal" aria-label="See what changes in your WhatsApp">i</button></p>
+    <p class="coex-fine">You just need to open WhatsApp Business every so often, as you already do every day.</p>
+  </div>
+</section>
+
+<!-- ============ PRECIO ============ -->
+<section id="precio">
+  <div class="container">
+    <p class="eyebrow">Pricing</p>
+    <h2 class="stitle">You pay for what you use.</h2>
+    <p class="sdesc">We are starting with the first developers, and we will set the final price based on what we learn there, not before. What is already decided is how it works:</p>
+    <div class="price-card">
+      <div class="pname">VOS plan</div>
+      <p class="pbody"><strong>Usage-based billing.</strong> No long contracts or lock-in: cancel whenever you want.</p>
+      <p class="pbody"><strong>What your team handles from the phone costs nothing.</strong> VOS covers what you can’t get to.</p>
+      <p class="pbody"><strong>You see the price before paying anything.</strong> Requesting a demo commits you to nothing.</p>
+      <ul class="plist">
+        <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>All your projects in one assistant</li>
+        <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Prospect details by WhatsApp and email</li>
+        <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Your usual number, your usual WhatsApp</li>
+        <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Sensitive texts approved by your team</li>
+        <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 13.4 4.6 10l-1.4 1.4L8 16.2 17 7.2l-1.4-1.4z"/></svg>Your data, always yours</li>
+      </ul>
+      <a class="btn btn-hondo" href="#anotarme">Request a demo</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ OTROS SECTORES ============ -->
+<section style="padding-top:0">
+  <div class="container">
+    <div class="band">
+      <div>
+        <h2>Built for real estate development. Trainable for your industry.</h2>
+        <p>VOS was born to handle prospects for real estate projects. If your business is different, we train it with your data and your rules.</p>
+      </div>
+      <a class="btn btn-linea" href="#anotarme">Tell us about your case</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAMILIA ACTAVIA ============ -->
+<section class="arena" id="familia">
+  <div class="container">
+    <p class="eyebrow">The Actavia family</p>
+    <h2 class="stitle">From the ground up to the lease: three products that work alone or together.</h2>
+    <p class="sdesc">VOS, BloqueRaíz and Avala are built by Actavia. Each one handles a stage of a real estate project: use one, two or all three.</p>
+    <div class="grid3 fam">
+      <div class="card">
+        <span class="rol">Finance</span>
+        <h3>BloqueRaíz</h3>
+        <p>Tokenization for pre-construction, in-progress or finished projects: the developer’s trust sells fractions to verified investors, with no debt.</p>
+        <a href="https://bloqueraiz.com/en" rel="noopener">bloqueraiz.com</a>
+      </div>
+      <div class="card aca">
+        <span class="rol">Sell · You are here</span>
+        <h3>VOS</h3>
+        <p>An assistant that answers WhatsApp with each project’s details, pre-qualifies every prospect and hands the lead to the sales team.</p>
+      </div>
+      <div class="card">
+        <span class="rol">Rent</span>
+        <h3>Avala</h3>
+        <p>The rental guarantee that enforces itself: the deposit is locked in a public contract, in the tenant’s name, with no property guarantor.</p>
+        <a href="https://avala.rent/en" rel="noopener">avala.rent</a>
+      </div>
+    </div>
+    <p class="juntos">Together: the developer funds the build with BloqueRaíz, answers prospects with VOS and, once the units are rented, Avala handles the guarantee and the payments.</p>
+  </div>
+</section>
+
+<!-- ============ CTA FINAL / FORM ============ -->
+<section class="cta-section" id="anotarme">
+  <div class="container">
+    <p class="eyebrow">Demo with your project</p>
+    <h2 class="stitle">No prospect left without an answer.</h2>
+    <p class="sdesc">Leave your contact and we’ll show you VOS working with one of your projects. If you prefer, someone on our team will call you and explain it plainly.</p>
+    <div class="formzone">
+      <form class="form" id="waitlist" novalidate>
+        <input class="field" id="email" type="email" placeholder="Your email" aria-label="Your email" autocomplete="email" required>
+        <input class="field" id="phone" type="tel" placeholder="Your WhatsApp (optional)" aria-label="Your WhatsApp (optional)" autocomplete="tel">
+        <!-- Honeypot. Invisible, fuera del orden de tabulacion y fuera del arbol
+             de accesibilidad: ninguna persona lo ve ni lo puede completar. Si
+             llega con algo, lo lleno un bot y el alta se descarta en el servidor.
+             El nombre NO es "empresa" ni "company" a proposito: esos disparan el
+             autocompletado del browser y llenarian el campo de un usuario real. -->
+        <div class="hp" aria-hidden="true">
+          <label for="vos-hp">Do not fill in</label>
+          <input id="vos-hp" name="vos-hp" type="text" tabindex="-1" autocomplete="off">
+        </div>
+        <div class="phonehint">Leave your number if you’d rather we call than write.</div>
+        <button class="btn btn-senal" id="submit" type="submit">Request a demo</button>
+      </form>
+      <div class="err" id="err" hidden>Oops, something went wrong. Please try again.</div>
+      <div class="done" id="done" hidden>
+        <div class="donetitle">Done. We’ll be in touch soon.</div>
+        <div class="donesub">Thank you. We’ll set up the demo with one of your projects.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MODAL — QUÉ CAMBIA EN TU WHATSAPP ============ -->
+<div class="modal-overlay" id="coexModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="coexModalTitle">
+    <button type="button" class="modal-close" id="coexModalClose" aria-label="Close">&times;</button>
+    <h3 id="coexModalTitle">What changes in your WhatsApp</h3>
+    <p>When you connect VOS, some WhatsApp Business features stop being available. Most businesses don’t use them, but we’d rather you know beforehand:</p>
+    <ul>
+      <li><b>Broadcast lists:</b> are disabled (existing ones become read-only).</li>
+      <li><b>Live location:</b> doesn’t work.</li>
+      <li><b>Editing or deleting sent messages:</b> not available.</li>
+      <li><b>Profile photo:</b> can’t be changed after connecting (set it the way you want beforehand).</li>
+      <li><b>Groups and calls:</b> keep working normally in your app, but VOS doesn’t take part.</li>
+      <li><b>WhatsApp for Windows:</b> not supported.</li>
+    </ul>
+    <p class="modal-cond"><b>And one important condition:</b><br>You need to open your WhatsApp Business at least once every 13 days. Otherwise, WhatsApp disconnects VOS automatically. It’s WhatsApp’s rule, not ours.</p>
+    <p class="modal-foot">Questions? Write to us before connecting and we’ll explain it plainly.</p>
+  </div>
+</div>
+
+<footer class="foot">
+  <div class="container">
+    <div class="foot-line"><a href="https://wa.me/5491176539950">WhatsApp +54 9 11 7653-9950</a> · <a href="mailto:contact@actavia.tech">contact@actavia.tech</a></div>
+    <div class="foot-line">Guides (in Spanish): <a href="/whatsapp-para-desarrolladoras-inmobiliarias">WhatsApp para desarrolladoras</a> · <a href="/precalificar-interesados-inmobiliarios">Precalificar interesados</a> · <a href="/proyecto-en-pozo-consultas-whatsapp">Consultas de un proyecto en pozo</a></div>
+    <div class="foot-line">Verified WhatsApp Business Platform technology provider</div>
+    <div class="foot-line">vos.chat · Virtual Operation System · <a href="https://actavia.tech" rel="noopener">Actavia LLC</a> · <a href="https://bloqueraiz.com/en" rel="noopener">BloqueRaíz</a> · <a href="https://avala.rent/en" rel="noopener">Avala</a> · <a href="privacidad.html">Privacy</a> · <a href="terminos.html">Terms</a></div>
+  </div>
+  <a class="wa-float" href="https://wa.me/5491176539950?text=Hi%2C%20I%27d%20like%20to%20know%20more%20about%20VOS%20for%20my%20company." target="_blank" rel="noopener" aria-label="Message us on WhatsApp" title="Message us on WhatsApp"><svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><path fill="#fff" d="M16.04 3C9.4 3 4 8.38 4 15.01c0 2.12.56 4.19 1.61 6.01L4 29l8.17-1.58A12.02 12.02 0 0 0 16.04 27C22.68 27 28 21.63 28 15.01S22.68 3 16.04 3zm0 21.86c-1.84 0-3.64-.5-5.21-1.43l-.37-.22-4.85.94.97-4.71-.24-.39a9.830 9.830 0 0 1-1.52-5.04c0-5.45 4.44-9.88 9.9-9.88 5.450 0 9.86 4.43 9.86 9.88 0 5.44-4.41 9.85-9.86 9.85zm5.43-7.38c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.070 2.88 1.21 3.08.15.2 2.1 3.2 5.08 4.49.71.31 1.27.49 1.7.63.71.23 1.36.2 1.88.12.57-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35z"/></svg></a>
+</footer>
+
+<script>
+  // ── Lista de espera ────────────────────────────────────────────────
+  // Se postea a /api/waitlist, del MISMO ORIGEN. Antes se le pegaba directo al
+  // RPC de Supabase desde acá, con la anon key a la vista y sin ninguna
+  // defensa: ahora el honeypot, el límite por IP y la validación del teléfono
+  // los aplica el servidor, que es el único lugar donde sirven.
+  // ────────────────────────────────────────────────────────────────────
+
+  (function () {
+    var form = document.getElementById('waitlist');
+    var input = document.getElementById('email');
+    var phoneInput = document.getElementById('phone');
+    var hpInput = document.getElementById('vos-hp');
+    var btn = document.getElementById('submit');
+    var errEl = document.getElementById('err');
+    var doneEl = document.getElementById('done');
+    var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Mismo criterio que el servidor: 8 a 15 dígitos, `+` opcional. Acá es para
+    // avisarle a la persona antes de mandar; la validación que cuenta es la de
+    // /api/waitlist, porque ésta se saltea sin pasar por el formulario.
+    var PHONE_RE = /^\+?\d{8,15}$/;
+    var MSG = {
+      limite: 'Too many attempts in a row. Wait a few minutes and try again.',
+      email: 'That email doesn’t look valid. Check it and try again.',
+      telefono: 'That number doesn’t look valid. Check it, or leave it empty.',
+      generico: 'Oops, something went wrong. Please try again.'
+    };
+    var LABEL = 'Request a demo';
+
+    function fallar(clave) {
+      errEl.textContent = MSG[clave] || MSG.generico;
+      errEl.hidden = false;
+    }
+    function habilitar() {
+      busy = false;
+      btn.disabled = false;
+      input.disabled = false;
+      phoneInput.disabled = false;
+      btn.textContent = LABEL;
+    }
+
+    var busy = false;
+    input.addEventListener('input', function () { errEl.hidden = true; });
+    phoneInput.addEventListener('input', function () { errEl.hidden = true; });
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (busy) return;
+      var email = (input.value || '').trim();
+      var phone = (phoneInput.value || '').trim();
+      if (!EMAIL_RE.test(email)) { fallar('email'); return; }
+      if (phone && !PHONE_RE.test(phone.replace(/[\s\-.()]/g, ''))) { fallar('telefono'); return; }
+
+      busy = true;
+      errEl.hidden = true;
+      btn.disabled = true;
+      input.disabled = true;
+      phoneInput.disabled = true;
+      btn.textContent = 'Sending…';
+
+      fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          phone: phone || null,
+          vos_hp: hpInput ? hpInput.value : ''
+        })
+      }).then(function (res) {
+        if (res.ok) {
+          form.hidden = true;
+          errEl.hidden = true;
+          doneEl.hidden = false;
+          return;
+        }
+        return res.json().catch(function () { return {}; }).then(function (data) {
+          fallar(data && data.error);
+          habilitar();
+        });
+      }).catch(function () {
+        fallar('generico');
+        habilitar();
+      });
+    });
+  })();
+
+  // ── Modal "Qué cambia en tu WhatsApp" — abre desde el ⓘ ─────────────
+  (function () {
+    var openBtn = document.getElementById('coexInfoBtn');
+    var modal = document.getElementById('coexModal');
+    var closeBtn = document.getElementById('coexModalClose');
+    if (!openBtn || !modal || !closeBtn) return;
+    var lastFocus = null;
+
+    function onKey(e) { if (e.key === 'Escape' || e.key === 'Esc') close(); }
+    function open() {
+      lastFocus = document.activeElement;
+      modal.hidden = false;
+      document.body.style.overflow = 'hidden';
+      document.addEventListener('keydown', onKey);
+      closeBtn.focus();
+    }
+    function close() {
+      modal.hidden = true;
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', onKey);
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+
+    openBtn.addEventListener('click', open);
+    closeBtn.addEventListener('click', close);
+    // Click en el fondo (fuera de la card) cierra.
+    modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
+  })();
+</script>
+</body>
+</html>
